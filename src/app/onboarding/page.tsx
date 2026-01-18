@@ -159,7 +159,7 @@ export default function OnboardingPage() {
                                             value={formData.name}
                                             onChange={handleInputChange}
                                             required
-                                            className="h-12 bg-transparent border-2 border-[var(--color-black-border)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 rounded-xl transition-all"
+                                            className="h-12 bg-transparent border-2 border-[var(--color-black-border)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 focus-visible:ring-2 focus-visible:outline-none rounded-xl transition-all"
                                         />
                                     </div>
 
@@ -174,7 +174,7 @@ export default function OnboardingPage() {
                                             value={formData.companyName}
                                             onChange={handleInputChange}
                                             required
-                                            className="h-12 bg-transparent border-2 border-[var(--color-black-border)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 rounded-xl transition-all"
+                                            className="h-12 bg-transparent border-2 border-[var(--color-black-border)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 focus-visible:ring-2 focus-visible:outline-none rounded-xl transition-all"
                                         />
                                     </div>
 
@@ -189,7 +189,7 @@ export default function OnboardingPage() {
                                             value={formData.role}
                                             onChange={handleInputChange}
                                             required
-                                            className="h-12 bg-transparent border-2 border-[var(--color-black-border)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 rounded-xl transition-all"
+                                            className="h-12 bg-transparent border-2 border-[var(--color-black-border)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 focus-visible:ring-2 focus-visible:outline-none rounded-xl transition-all"
                                         />
                                     </div>
 

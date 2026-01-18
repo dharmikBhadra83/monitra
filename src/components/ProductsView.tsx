@@ -18,10 +18,11 @@ import {
   DialogHeader, 
   DialogTitle 
 } from "@/components/ui/dialog";
-import { ChevronDown, ChevronRight, Trash2, AlertCircle, ExternalLink, Pencil, Plus, DollarSign } from 'lucide-react';
+import { ChevronDown, ChevronRight, Trash2, AlertCircle, ExternalLink, Pencil, Plus, DollarSign, X, Layers } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { convertFromUSD, formatPrice } from '@/lib/currency';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AddCompetitorForm } from '@/components/AddCompetitorForm';
 
 // --- 1. THE PERFECT CENTER CONNECTOR ---
 function TreeConnector({ isOpen, competitorCount }: { isOpen: boolean; competitorCount: number }) {
@@ -104,8 +105,6 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
   const [editForm, setEditForm] = useState({ name: '', brand: '', url: '' });
   const [isSaving, setIsSaving] = useState(false);
   const [addCompetitorMainProductId, setAddCompetitorMainProductId] = useState<string | null>(null);
-  const [competitorUrl, setCompetitorUrl] = useState('');
-  const [isAddingCompetitor, setIsAddingCompetitor] = useState(false);
   const productsArray = Array.isArray(data) ? data : (data?.products || []);
 
   const toggleProduct = (id: string) => {
@@ -225,38 +224,6 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
     }
   };
 
-  const handleAddCompetitor = async () => {
-    if (!addCompetitorMainProductId || !competitorUrl.trim()) return;
-
-    setIsAddingCompetitor(true);
-    try {
-      const response = await fetch('/api/products/add-competitor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mainProductId: addCompetitorMainProductId,
-          competitorUrl: competitorUrl.trim(),
-        }),
-      });
-
-      if (response.ok) {
-        // Refresh the products list
-        if (onDelete) {
-          onDelete();
-        }
-        setAddCompetitorMainProductId(null);
-        setCompetitorUrl('');
-      } else {
-        const error = await response.json();
-        alert('Failed to add competitor: ' + (error.error || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Add competitor error:', error);
-      alert('Failed to add competitor');
-    } finally {
-      setIsAddingCompetitor(false);
-    }
-  };
 
   // Helper to format price in selected currency
   const formatPriceInCurrency = (priceUSD: number) => {
@@ -280,7 +247,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
           <select
             value={selectedCurrency || 'USD'}
             onChange={(e) => setSelectedCurrency && setSelectedCurrency(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-[#111] border border-[#1a1a1a] text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#e11d48] hover:bg-[#0f0f0f] transition-colors"
+            className="px-4 py-2 rounded-lg bg-[var(--color-black-card)] border border-[var(--color-black-border)] text-[var(--color-black-text)] text-sm focus:outline-none focus:border-[var(--color-red-primary)] focus:ring-2 focus:ring-[var(--color-red-primary)]/20 hover:bg-[var(--color-black-card-hover)] transition-colors"
           >
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>
@@ -295,7 +262,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
         {/* Add Product Button */}
         <Button
           onClick={() => onAddProduct && onAddProduct()}
-          className="bg-[#e11d48] hover:bg-[#be185d] text-white font-bold px-6 py-2 rounded-lg transition-colors"
+          className="bg-[#e11d48] hover:bg-[#be185d] text-white font-bold px-6 py-2 rounded-lg transition-colors cursor-pointer"
         >
           + Add Product
         </Button>
@@ -337,7 +304,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                     <TableCell className="py-5">
                       <div className="flex items-center gap-4 ml-4">
                         {isExpanded ? <ChevronDown className="w-4 h-4 text-[#e11d48]" /> : <ChevronRight className="w-4 h-4 text-zinc-600" />}
-                        <div className="w-10 h-10 rounded-lg bg-[#111] border border-[#222] overflow-hidden flex-shrink-0 relative z-10">
+                        <div className="w-10 h-10 rounded-lg bg-[#111] border border-[#222] overflow-hidden shrink-0 relative z-10">
                            <img src={mainProduct?.imageUrl} className="w-full h-full object-contain" alt="" />
                         </div>
                       </div>
@@ -378,7 +345,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                             e.stopPropagation();
                             handleEditClick(mainProduct);
                           }}
-                          className="text-zinc-700 hover:text-blue-500 hover:bg-blue-500/10 transition-colors"
+                          className="text-zinc-700 hover:text-blue-500 hover:bg-blue-500/10 transition-colors cursor-pointer"
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -387,9 +354,9 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                           size="icon" 
                           onClick={(e) => { 
                             e.stopPropagation();
-                            setAddCompetitorMainProductId(product.id);
+                            setAddCompetitorMainProductId(mainProduct.id);
                           }}
-                          className="text-zinc-700 hover:text-green-500 hover:bg-green-500/10 transition-colors"
+                          className="text-zinc-700 hover:text-green-500 hover:bg-green-500/10 transition-colors cursor-pointer"
                         >
                           <Plus className="w-4 h-4" />
                         </Button>
@@ -399,9 +366,9 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                           onClick={(e) => { 
                             e.stopPropagation(); // Prevent row expansion
                             // Use canonicalProductId if available, otherwise use product id
-                            setDeleteId(product.canonicalProductId?.toString() || product.id); 
+                            setDeleteId(mainProduct.canonicalProductId?.toString() || mainProduct.id); 
                           }}
-                          className="text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                          className="text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -553,7 +520,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
               <Input
                 value={editForm.name}
                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="bg-[#111] border-[#1a1a1a] text-white placeholder:text-zinc-500"
+                className="bg-transparent border-[var(--color-black-border)] text-[var(--color-black-text)] placeholder:text-[var(--color-black-text-muted)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 focus-visible:ring-2 focus-visible:outline-none"
                 placeholder="Enter product name"
               />
             </div>
@@ -562,7 +529,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
               <Input
                 value={editForm.brand}
                 onChange={(e) => setEditForm({ ...editForm, brand: e.target.value })}
-                className="bg-[#111] border-[#1a1a1a] text-white placeholder:text-zinc-500"
+                className="bg-transparent border-[var(--color-black-border)] text-[var(--color-black-text)] placeholder:text-[var(--color-black-text-muted)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 focus-visible:ring-2 focus-visible:outline-none"
                 placeholder="Enter brand name"
               />
             </div>
@@ -571,7 +538,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
               <Input
                 value={editForm.url}
                 onChange={(e) => setEditForm({ ...editForm, url: e.target.value })}
-                className="bg-[#111] border-[#1a1a1a] text-white placeholder:text-zinc-500"
+                className="bg-transparent border-[var(--color-black-border)] text-[var(--color-black-text)] placeholder:text-[var(--color-black-text-muted)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 focus-visible:ring-2 focus-visible:outline-none"
                 placeholder="https://example.com/product"
               />
             </div>
@@ -596,52 +563,39 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
         </DialogContent>
       </Dialog>
 
-      {/* --- 5. ADD COMPETITOR DIALOG --- */}
-      <Dialog open={!!addCompetitorMainProductId} onOpenChange={() => {
-        setAddCompetitorMainProductId(null);
-        setCompetitorUrl('');
-      }}>
-        <DialogContent className="bg-[#0a0a0a] border-[#1a1a1a] text-white sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Add Competitor</DialogTitle>
-            <DialogDescription className="text-zinc-400 mt-2">
-              Enter the URL of a competitor product to add to this mapping.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300">Competitor Product URL</label>
-              <Input
-                value={competitorUrl}
-                onChange={(e) => setCompetitorUrl(e.target.value)}
-                className="bg-[#111] border-[#1a1a1a] text-white placeholder:text-zinc-500"
-                placeholder="https://example.com/competitor-product"
-                type="url"
-              />
-            </div>
-          </div>
-          <DialogFooter className="flex gap-3 mt-6">
-            <Button 
-              variant="ghost" 
-              onClick={() => {
-                setAddCompetitorMainProductId(null);
-                setCompetitorUrl('');
-              }}
-              className="flex-1 bg-[#111] text-zinc-300 hover:text-white hover:bg-[#222] border border-[#222]"
-              disabled={isAddingCompetitor}
-            >
-              Cancel
-            </Button>
-            <Button 
-              className="flex-1 bg-[#e11d48] hover:bg-[#be185d] text-white font-bold" 
-              onClick={handleAddCompetitor}
-              disabled={isAddingCompetitor || !competitorUrl.trim()}
-            >
-              {isAddingCompetitor ? 'Adding...' : 'Add Competitor'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* --- 5. ADD COMPETITOR FORM --- */}
+      {addCompetitorMainProductId && (() => {
+        // Find the product group that contains this product
+        const productGroup = productsArray.find((group: any) => {
+          const mainProduct = group.mainProduct || group;
+          return mainProduct.id === addCompetitorMainProductId;
+        });
+        
+        if (!productGroup) {
+          return null;
+        }
+
+        const mainProduct = productGroup.mainProduct || productGroup;
+        
+        if (!mainProduct.canonicalProductId) {
+          return null;
+        }
+
+        return (
+          <AddCompetitorForm
+            canonicalProductId={mainProduct.canonicalProductId}
+            onClose={() => {
+              setAddCompetitorMainProductId(null);
+            }}
+            onSuccess={() => {
+              if (onDelete) {
+                onDelete();
+              }
+              setAddCompetitorMainProductId(null);
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }
