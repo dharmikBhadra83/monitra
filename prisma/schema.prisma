@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model SiteConfig {
+  id            String   @id @default(cuid())
+  domain        String   @unique
+  nameSelector  String?
+  priceSelector String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model CanonicalProduct {
+  id        Int       @id @default(autoincrement())
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+// Product: Product catalog entries
+// Products are identified by URL and grouped by canonicalProductId (competitive product group ID)
+// When a product group is deleted, products with that canonicalProductId are removed
+model Product {
+  id                String           @id @default(cuid())
+  url               String           @unique
+  name              String
+  brand             String
+  latestPrice       Decimal          @db.Decimal(19, 3) // Price in original currency with 3 decimal places
+  currency          String           @default("USD")
+  priceUSD          Decimal          @db.Decimal(19, 3) // Always stored in USD for consistent comparison with 3 decimal places
+  imageUrl          String?
+  canonicalProductId Int?            // Links to CanonicalProduct for grouping competitive products
+  canonicalProduct  CanonicalProduct? @relation(fields: [canonicalProductId], references: [id], onDelete: Cascade)
+  userId            String           // User who owns this product
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs              PriceLog[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@index([canonicalProductId])
+  @@index([userId])
+}
+
+// PriceLog: Historical price tracking for products
+// Automatically deleted when product is deleted (cascade via foreign key)
+model PriceLog {
+  id        String   @id @default(cuid())
+  price     Decimal  @db.Decimal(19, 3) // Price in original currency with 3 decimal places
+  priceUSD  Decimal  @db.Decimal(19, 3) // Price in USD for historical tracking with 3 decimal places
+  currency  String   @default("USD")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  timestamp DateTime @default(now())
+}
+
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                  String           @id @default(cuid())
+  name                String?
+  email               String?          @unique
+  emailVerified       DateTime?
+  image               String?
+  companyName         String?
+  role                String?
+  employeeCount       String?
+  onboardingCompleted Boolean          @default(false)
+  accounts            Account[]
+  sessions            Session[]
+  products            Product[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

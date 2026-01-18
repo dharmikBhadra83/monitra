@@ -1,0 +1,296 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  /* Red and Black Color Scheme */
+  --color-red-primary: #f43f5e;
+  --color-red-primary-rgb: 244, 63, 94;
+  --color-red-opacity: rgba(244, 63, 94, 0.11);
+  --color-red-glow: rgba(244, 63, 94, 0.3);
+  --color-red-border: rgba(244, 63, 94, 0.2);
+  
+  --color-black-bg: #000000;
+  --color-black-card: #1a1a1a;
+  --color-black-card-hover: #252525;
+  --color-black-border: #2a2a2a;
+  --color-black-text: #ffffff;
+  --color-black-text-muted: #a3a3a3;
+  --color-black-text-secondary: #6b6b6b;
+  
+  /* Legacy variables for compatibility */
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #1a1a1a;
+  --card-foreground: #ffffff;
+  --popover: #1a1a1a;
+  --popover-foreground: #ffffff;
+  --primary: #f43f5e;
+  --primary-foreground: #ffffff;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
+  --muted: #2a2a2a;
+  --muted-foreground: #a3a3a3;
+  --accent: #1a1a1a;
+  --accent-foreground: #ffffff;
+  --destructive: #f43f5e;
+  --destructive-foreground: #ffffff;
+  --border: #2a2a2a;
+  --input: #1a1a1a;
+  --ring: #f43f5e;
+  --radius: 0.75rem;
+
+  /* Sidebar CSS Variables */
+  --sidebar-background: 0 0% 0%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 347 77% 50%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 10%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 0 0% 16%;
+  --sidebar-ring: 347 77% 50%;
+}
+
+/* Sidebar custom styles for dark theme */
+[data-sidebar="sidebar"] {
+  background: hsl(var(--sidebar-background)) !important;
+  color: hsl(var(--sidebar-foreground)) !important;
+  border-color: hsl(var(--sidebar-border)) !important;
+}
+
+[data-sidebar="trigger"] {
+  color: hsl(var(--sidebar-foreground)) !important;
+}
+
+[data-sidebar="trigger"]:hover {
+  background: hsl(var(--sidebar-accent)) !important;
+  color: hsl(var(--sidebar-primary)) !important;
+}
+
+body {
+  background-color: var(--color-black-bg);
+  color: var(--color-black-text);
+  font-family: var(--font-sans);
+}
+
+/* Card Styles */
+.card-dark {
+  background: var(--color-black-card);
+  border: 1px solid var(--color-black-border);
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+}
+
+.card-dark:hover {
+  background: var(--color-black-card-hover);
+  border-color: var(--color-red-border);
+}
+
+.red-glow {
+  box-shadow: 0 0 20px -5px var(--color-red-glow);
+}
+
+.red-glow-active {
+  box-shadow: 0 0 30px -5px var(--color-red-glow), 0 0 60px -10px var(--color-red-glow);
+}
+
+/* Input Glow Effect */
+.input-glow:focus {
+  box-shadow: 0 0 0 3px var(--color-red-opacity), 0 0 20px -5px var(--color-red-glow);
+}
+
+.input-glow:hover:not(:focus) {
+  box-shadow: 0 0 0 1px var(--color-red-border);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Sparkling Effect for AI-Powered Intelligence Badge */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes sparkle-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(192, 192, 192, 0.3),
+                0 0 10px rgba(192, 192, 192, 0.2),
+                0 0 15px rgba(192, 192, 192, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(192, 192, 192, 0.6),
+                0 0 20px rgba(192, 192, 192, 0.4),
+                0 0 30px rgba(192, 192, 192, 0.2);
+  }
+}
+
+.sparkle-container {
+  position: relative;
+  display: inline-block;
+}
+
+.sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #c0c0c0;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: sparkle 2s infinite;
+}
+
+.sparkle:nth-child(1) {
+  top: -5px;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.sparkle:nth-child(2) {
+  top: -3px;
+  right: 15%;
+  animation-delay: 0.5s;
+}
+
+.sparkle:nth-child(3) {
+  bottom: -5px;
+  left: 20%;
+  animation-delay: 1s;
+}
+
+.sparkle:nth-child(4) {
+  bottom: -3px;
+  right: 10%;
+  animation-delay: 1.5s;
+}
+
+.sparkle:nth-child(5) {
+  top: 50%;
+  left: -5px;
+  animation-delay: 0.3s;
+}
+
+.sparkle:nth-child(6) {
+  top: 50%;
+  right: -5px;
+  animation-delay: 0.8s;
+}
+
+.sparkle-glow {
+  animation: sparkle-glow 2s ease-in-out infinite;
+}
+
+/* Glowing Red Text Effect - No Shadow, No Animation */
+.glowing-red-text {
+  color: var(--color-red-primary);
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-smooth: always;
+}
+
+/* Sparkle for Title */
+.title-sparkle-container {
+  position: relative;
+  display: inline-block;
+}
+
+.title-sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #c0c0c0;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: title-sparkle 2.5s infinite;
+  box-shadow: 0 0 8px rgba(192, 192, 192, 0.8);
+}
+
+.title-sparkle:nth-child(1) {
+  top: -10px;
+  left: 5%;
+  animation-delay: 0s;
+}
+
+.title-sparkle:nth-child(2) {
+  top: 10px;
+  left: 15%;
+  animation-delay: 0.4s;
+}
+
+.title-sparkle:nth-child(3) {
+  top: -8px;
+  left: 30%;
+  animation-delay: 0.8s;
+}
+
+.title-sparkle:nth-child(4) {
+  top: 12px;
+  left: 45%;
+  animation-delay: 1.2s;
+}
+
+.title-sparkle:nth-child(5) {
+  top: -10px;
+  left: 60%;
+  animation-delay: 1.6s;
+}
+
+.title-sparkle:nth-child(6) {
+  top: 8px;
+  left: 75%;
+  animation-delay: 2s;
+}
+
+.title-sparkle:nth-child(7) {
+  top: -12px;
+  right: 10%;
+  animation-delay: 0.6s;
+}
+
+.title-sparkle:nth-child(8) {
+  top: 10px;
+  right: 5%;
+  animation-delay: 1.4s;
+}
+
+@keyframes title-sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
