@@ -201,7 +201,7 @@ export async function parseProductFromHtml(
                     const extractedPrice = extractPrice(priceText);
                     if (extractedPrice > 0 && isValidPrice(extractedPrice)) {
                         price = extractedPrice;
-                        currency = extractCurrency(priceText);
+                    currency = extractCurrency(priceText);
                         console.log(`[HTML Parser] ✅ Price extracted via fallback selector "${selector}": ${price} ${currency}`);
                         break;
                     }
@@ -239,10 +239,10 @@ export async function parseProductFromHtml(
                 if (text.includes(symbol) && /\d/.test(text) && text.length < 200) {
                     const extractedPrice = extractPrice(text);
                     if (extractedPrice > 0 && isValidPrice(extractedPrice) && !isSuspiciousPrice(extractedPrice, text)) {
-                        price = extractedPrice;
-                        currency = extractCurrency(text);
-                        console.log(`[HTML Parser] ✅ Price extracted via LAST RESORT method (currency symbol search): ${price} ${currency} from text: "${text.substring(0, 50)}..."`);
-                        return false; // Stop iteration
+                            price = extractedPrice;
+                            currency = extractCurrency(text);
+                            console.log(`[HTML Parser] ✅ Price extracted via LAST RESORT method (currency symbol search): ${price} ${currency} from text: "${text.substring(0, 50)}..."`);
+                            return false; // Stop iteration
                     } else if (extractedPrice > 0 && isSuspiciousPrice(extractedPrice, text)) {
                         console.log(`[HTML Parser] ⚠️ Suspicious price from LAST RESORT (likely rating): ${extractedPrice} from text: "${text.substring(0, 50)}..."`);
                     }

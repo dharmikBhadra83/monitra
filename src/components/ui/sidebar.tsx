@@ -192,8 +192,8 @@ const Sidebar = React.forwardRef<
             : "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]",
           state === "collapsed" && collapsible === "icon" ? "w-[var(--sidebar-width-icon)]" : "w-[var(--sidebar-width)]"
         )}
-        style={{ 
-          width: state === "collapsed" && collapsible === "icon" ? SIDEBAR_WIDTH_ICON : SIDEBAR_WIDTH 
+        style={{
+          width: state === "collapsed" && collapsible === "icon" ? SIDEBAR_WIDTH_ICON : SIDEBAR_WIDTH
         } as React.CSSProperties}
       />
       <div
@@ -208,8 +208,8 @@ const Sidebar = React.forwardRef<
             : "group-data-[side=left]:border-r group-data-[side=right]:border-l",
           className
         )}
-        style={{ 
-          width: state === "collapsed" && collapsible === "icon" ? SIDEBAR_WIDTH_ICON : SIDEBAR_WIDTH 
+        style={{
+          width: state === "collapsed" && collapsible === "icon" ? SIDEBAR_WIDTH_ICON : SIDEBAR_WIDTH
         } as React.CSSProperties}
         ref={ref}
         {...props}
@@ -279,7 +279,7 @@ const SidebarRail = React.forwardRef<HTMLButtonElement, React.ComponentProps<"bu
 )
 SidebarRail.displayName = "SidebarRail"
 
-const SidebarInset = React.forwardRef<HTMLMainElement, React.ComponentProps<"main">>(
+const SidebarInset = React.forwardRef<HTMLElement, React.ComponentProps<"main">>(
   ({ className, ...props }, ref) => {
     return (
       <main
@@ -561,7 +561,7 @@ const SidebarMenuAction = React.forwardRef<
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]/sidebar-wrapper:hidden",
         showOnHover &&
-          "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
+        "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
         className
       )}
       {...props}

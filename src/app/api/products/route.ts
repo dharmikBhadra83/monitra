@@ -17,11 +17,11 @@ export async function GET() {
         userId: userId,
         canonicalProductId: { not: null } // Only get products that belong to a group
       } as any,
-      include: {
-        logs: {
-          orderBy: { timestamp: 'desc' },
-          take: 1
-        }
+          include: {
+            logs: {
+              orderBy: { timestamp: 'desc' },
+              take: 1
+            }
       },
       orderBy: {
         createdAt: 'asc' // Order by creation date ascending to identify main product (created first)

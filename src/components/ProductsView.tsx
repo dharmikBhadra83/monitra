@@ -1,22 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { ChevronDown, ChevronRight, Trash2, AlertCircle, ExternalLink, Pencil, Plus, DollarSign, X, Layers } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -33,10 +33,10 @@ function TreeConnector({ isOpen, competitorCount }: { isOpen: boolean; competito
   const rowHeight = 72;
   const borderHeight = 1;
   const totalRowHeight = rowHeight + borderHeight;
-  
+
   // Calculate center Y position for each competitor row
   const branchYPositions: number[] = [];
-  
+
   for (let i = 0; i < competitorCount; i++) {
     // Each row center: (rowHeight / 2) + (i * totalRowHeight)
     const yCenter = (rowHeight / 2) + (i * totalRowHeight);
@@ -46,12 +46,12 @@ function TreeConnector({ isOpen, competitorCount }: { isOpen: boolean; competito
   // --- PATH DRAWING ---
   // Start from top (where main product row ends) - offset to connect from icon
   const startOffset = 24; // Offset from top to align with icon bottom
-  let pathD = `M0,${startOffset} `; 
-  
+  let pathD = `M0,${startOffset} `;
+
   // Draw trunk to last branch
   const lastBranchY = branchYPositions[branchYPositions.length - 1];
   pathD += `V${lastBranchY} `;
-  
+
   // Add branches for each competitor - curve to center of each row
   branchYPositions.forEach((y) => {
     // Branch pattern: M0,y Q0,y+20 20,y+20 H52 (matching HTML pattern)
@@ -63,25 +63,25 @@ function TreeConnector({ isOpen, competitorCount }: { isOpen: boolean; competito
   return (
     <svg
       className="absolute pointer-events-none overflow-visible"
-      style={{ 
+      style={{
         top: '-24px', // Start from bottom of icon (matches HTML)
         left: '44px', // Aligned with icon center
-        width: '52px', 
-        height: `${totalHeight}px`, 
-        zIndex: 5 
+        width: '52px',
+        height: `${totalHeight}px`,
+        zIndex: 5
       }}
       viewBox={`0 0 52 ${totalHeight}`}
     >
       {/* Grey Background Path */}
-      <path 
-        d={pathD} 
-        fill="none" 
-        stroke="#262626" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
+      <path
+        d={pathD}
+        fill="none"
+        stroke="#262626"
+        strokeWidth="2"
+        strokeLinecap="round"
         strokeLinejoin="round"
       />
-      
+
       {/* Red Animated Liquid Path */}
       <motion.path
         d={pathD}
@@ -101,8 +101,9 @@ function TreeConnector({ isOpen, competitorCount }: { isOpen: boolean; competito
 // --- 2. MAIN COMPONENT ---
 export function ProductsView({ data, expandedProducts, setExpandedProducts, onDelete, onAddProduct, selectedCurrency, setSelectedCurrency }: any) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editProduct, setEditProduct] = useState<{ id: string; name: string; brand: string; url: string } | null>(null);
-  const [editForm, setEditForm] = useState({ name: '', brand: '', url: '' });
+  const [deleteCompetitorId, setDeleteCompetitorId] = useState<{ id: string; name: string } | null>(null);
+  const [editProduct, setEditProduct] = useState<{ id: string; name: string; brand: string; url: string; imageUrl: string; priceUSD: number } | null>(null);
+  const [editForm, setEditForm] = useState<{ name: string; brand: string; url: string; imageUrl: string; priceUSD: string | number }>({ name: '', brand: '', url: '', imageUrl: '', priceUSD: 0 });
   const [isSaving, setIsSaving] = useState(false);
   const [addCompetitorMainProductId, setAddCompetitorMainProductId] = useState<string | null>(null);
   const productsArray = Array.isArray(data) ? data : (data?.products || []);
@@ -142,22 +143,16 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
     return cleaned;
   };
 
-  // Helper to truncate product title
-  const truncateTitle = (title: string | null | undefined, maxLength: number = 60): string => {
-    if (!title) return '-';
-    const cleaned = title.trim();
-    if (cleaned.length <= maxLength) return cleaned;
-    return cleaned.substring(0, maxLength) + '...';
-  };
+
 
   const handleDeleteConfirm = async () => {
     if (!deleteId) return;
-    
+
     try {
       const response = await fetch(`/api/products/${deleteId}`, {
         method: 'DELETE',
       });
-      
+
       if (response.ok) {
         // Refresh the products list by calling onDelete callback
         if (onDelete) {
@@ -176,23 +171,54 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
     }
   };
 
+  const handleDeleteCompetitorConfirm = async () => {
+    if (!deleteCompetitorId) return;
+
+    try {
+      const response = await fetch('/api/products/remove-competitor', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: deleteCompetitorId.id }),
+      });
+
+      if (response.ok) {
+        if (onDelete) {
+          onDelete();
+        }
+        setDeleteCompetitorId(null);
+      } else {
+        const error = await response.json();
+        alert('Failed to remove competitor: ' + (error.error || 'Unknown error'));
+        setDeleteCompetitorId(null);
+      }
+    } catch (error) {
+      console.error('Remove competitor error:', error);
+      alert('Failed to remove competitor');
+      setDeleteCompetitorId(null);
+    }
+  };
+
   const handleEditClick = (product: any) => {
     setEditProduct({
       id: product.id,
       name: product.name || '',
       brand: product.brand || '',
       url: product.url || '',
+      imageUrl: product.imageUrl || '',
+      priceUSD: product.priceUSD || product.latestPrice || 0
     });
     setEditForm({
       name: product.name || '',
       brand: product.brand || '',
       url: product.url || '',
+      imageUrl: product.imageUrl || '',
+      priceUSD: product.priceUSD || product.latestPrice || 0
     });
   };
 
   const handleEditSave = async () => {
     if (!editProduct) return;
-    
+
     setIsSaving(true);
     try {
       const response = await fetch('/api/products/update', {
@@ -203,6 +229,8 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
           name: editForm.name,
           brand: editForm.brand,
           url: editForm.url,
+          imageUrl: editForm.imageUrl,
+          priceUSD: editForm.priceUSD
         }),
       });
 
@@ -247,15 +275,21 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
           <select
             value={selectedCurrency || 'USD'}
             onChange={(e) => setSelectedCurrency && setSelectedCurrency(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-[var(--color-black-card)] border border-[var(--color-black-border)] text-[var(--color-black-text)] text-sm focus:outline-none focus:border-[var(--color-red-primary)] focus:ring-2 focus:ring-[var(--color-red-primary)]/20 hover:bg-[var(--color-black-card-hover)] transition-colors"
+            className="px-4 py-2.5 rounded-lg bg-[#111] border-2 border-[#1a1a1a] text-white text-sm font-medium cursor-pointer focus:outline-none focus:border-[#e11d48] focus:ring-2 focus:ring-[#e11d48]/20 hover:border-[#2a2a2a] hover:bg-[#151515] transition-all shadow-sm min-w-[140px] appearance-none pr-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 0.75rem center',
+              backgroundSize: '1rem 1rem'
+            }}
           >
-            <option value="USD">USD ($)</option>
-            <option value="EUR">EUR (€)</option>
-            <option value="GBP">GBP (£)</option>
-            <option value="INR">INR (₹)</option>
-            <option value="JPY">JPY (¥)</option>
-            <option value="CAD">CAD (C$)</option>
-            <option value="AUD">AUD (A$)</option>
+            <option value="USD" className="bg-[#111] text-white">USD ($)</option>
+            <option value="EUR" className="bg-[#111] text-white">EUR (€)</option>
+            <option value="GBP" className="bg-[#111] text-white">GBP (£)</option>
+            <option value="INR" className="bg-[#111] text-white">INR (₹)</option>
+            <option value="JPY" className="bg-[#111] text-white">JPY (¥)</option>
+            <option value="CAD" className="bg-[#111] text-white">CAD (C$)</option>
+            <option value="AUD" className="bg-[#111] text-white">AUD (A$)</option>
           </select>
         </div>
 
@@ -273,12 +307,12 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
           <TableHeader className="bg-[#0a0a0a]">
             <TableRow className="border-[#1a1a1a] hover:bg-transparent">
               <TableHead className="w-[100px]"></TableHead>
-              <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em]">Name</TableHead>
-              <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em]">Brand</TableHead>
-              <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em]">Website</TableHead>
-              <TableHead className="text-right text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em]">Price</TableHead>
-              <TableHead className="text-right text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em]">Diff</TableHead>
-              <TableHead className="w-[80px]"></TableHead>
+              <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em] w-auto">Name</TableHead>
+              <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em] w-[120px]">Brand</TableHead>
+              <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em] w-[160px]">Website</TableHead>
+              <TableHead className="text-left text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em] w-[140px]">Price</TableHead>
+              <TableHead className="text-right text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em] w-[100px]">Diff</TableHead>
+              <TableHead className="w-[100px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -287,7 +321,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
               const competitors = product.competitors || [];
               const mainProduct = product.mainProduct || product;
               const mainPrice = mainProduct?.priceUSD || mainProduct?.latestPrice || 0;
-              
+
               // Calculate price difference
               const competitorPrices = competitors.map((c: any) => c.priceUSD || c.latestPrice || 0).filter((p: number) => p > 0);
               const minPrice = competitorPrices.length > 0 ? Math.min(...competitorPrices) : 0;
@@ -297,51 +331,52 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
               return (
                 <React.Fragment key={product.id}>
                   {/* PARENT PRODUCT ROW */}
-                  <TableRow 
+                  <TableRow
                     className={`cursor-pointer border-[#1a1a1a] transition-colors ${isExpanded ? 'bg-[#0a0a0a]' : 'hover:bg-[#0f0f0f]'}`}
                     onClick={() => toggleProduct(product.id)}
+                    style={{ height: '72px' }}
                   >
-                    <TableCell className="py-5">
+                    <TableCell className="w-[100px] py-0">
                       <div className="flex items-center gap-4 ml-4">
                         {isExpanded ? <ChevronDown className="w-4 h-4 text-[#e11d48]" /> : <ChevronRight className="w-4 h-4 text-zinc-600" />}
                         <div className="w-10 h-10 rounded-lg bg-[#111] border border-[#222] overflow-hidden shrink-0 relative z-10">
-                           <img src={mainProduct?.imageUrl} className="w-full h-full object-contain" alt="" />
+                          <img src={mainProduct?.imageUrl} className="w-full h-full object-contain" alt="" />
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-bold text-zinc-100">
-                      <span 
+                    <TableCell className="font-bold text-zinc-100 py-0">
+                      <span
                         title={mainProduct?.name || ''}
-                        className="cursor-help"
+                        className="cursor-help line-clamp-2"
                       >
-                        {truncateTitle(mainProduct?.name)}
+                        {mainProduct?.name}
                       </span>
                     </TableCell>
-                    <TableCell className="text-zinc-400">{cleanBrand(mainProduct?.brand) || '-'}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-zinc-400 w-[120px] py-0">{cleanBrand(mainProduct?.brand) || '-'}</TableCell>
+                    <TableCell className="w-[160px] py-0">
                       {mainProduct?.url ? (
                         <a
                           href={mainProduct.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-zinc-400 hover:text-[#e11d48] transition-colors flex items-center gap-1"
+                          className="text-zinc-400 hover:text-[#e11d48] transition-colors flex items-center gap-1 truncate"
                         >
                           {getDomainFromUrl(mainProduct.url)}
-                          <ExternalLink className="w-3 h-3" />
+                          <ExternalLink className="w-3 h-3 shrink-0" />
                         </a>
                       ) : (
                         <span className="text-zinc-400">-</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-right font-black text-white text-lg">{formatPriceInCurrency(mainPrice)}</TableCell>
-                    <TableCell className="text-right font-bold text-[#e11d48]">{diffText}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-left font-black text-white text-lg w-[140px] py-0">{formatPriceInCurrency(mainPrice)}</TableCell>
+                    <TableCell className="text-right font-bold text-[#e11d48] w-[100px] py-0">{diffText}</TableCell>
+                    <TableCell className="w-[100px] py-0">
                       <div className="flex items-center gap-2 justify-end">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={(e) => { 
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
                             e.stopPropagation();
                             handleEditClick(mainProduct);
                           }}
@@ -349,10 +384,10 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={(e) => { 
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
                             e.stopPropagation();
                             setAddCompetitorMainProductId(mainProduct.id);
                           }}
@@ -360,13 +395,13 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                         >
                           <Plus className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={(e) => { 
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
                             e.stopPropagation(); // Prevent row expansion
                             // Use canonicalProductId if available, otherwise use product id
-                            setDeleteId(mainProduct.canonicalProductId?.toString() || mainProduct.id); 
+                            setDeleteId(mainProduct.canonicalProductId?.toString() || mainProduct.id);
                           }}
                           className="text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
                         >
@@ -399,66 +434,77 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                         {competitors.map((comp: any, idx: number) => {
                           const compPrice = comp.priceUSD || comp.latestPrice || 0;
                           const compBrand = cleanBrand(comp.brand);
-                          
+
                           return (
-                            <TableRow 
+                            <TableRow
                               key={idx}
                               className="bg-black border-[#1a1a1a] hover:bg-[#0f0f0f] border-b border-t"
                               style={{ height: '72px' }}
                             >
                               {/* Icon column spacer - matches main row icon column */}
                               <TableCell className="w-[100px]"></TableCell>
-                              
+
                               {/* Name column - matches main row Name */}
-                              <TableCell className="font-bold text-zinc-100">
-                                <span 
+                              <TableCell className="font-bold text-zinc-100 py-0">
+                                <span
                                   title={comp.name || ''}
-                                  className="cursor-help"
+                                  className="cursor-help line-clamp-2"
                                 >
-                                  {truncateTitle(comp.name)}
+                                  {comp.name}
                                 </span>
                               </TableCell>
-                              
+
                               {/* Brand column - matches main row Brand */}
-                              <TableCell className="text-zinc-400">{compBrand || '-'}</TableCell>
-                              
+                              <TableCell className="text-zinc-400 w-[120px] py-0">{compBrand || '-'}</TableCell>
+
                               {/* Website column - matches main row Website */}
-                              <TableCell>
+                              <TableCell className="w-[160px] py-0">
                                 {comp.url ? (
                                   <a
                                     href={comp.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-zinc-400 hover:text-[#e11d48] transition-colors flex items-center gap-1"
+                                    className="text-zinc-400 hover:text-[#e11d48] transition-colors flex items-center gap-1 truncate"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     {getDomainFromUrl(comp.url)}
-                                    <ExternalLink className="w-3 h-3" />
+                                    <ExternalLink className="w-3 h-3 shrink-0" />
                                   </a>
                                 ) : (
                                   <span className="text-zinc-400">-</span>
                                 )}
                               </TableCell>
-                              
-                              {/* Price column - matches main row Price (text-right) */}
-                              <TableCell className="text-right font-black text-white text-lg">{formatPriceInCurrency(compPrice)}</TableCell>
-                              
+
+                              {/* Price column - matches main row Price (text-left) */}
+                              <TableCell className="text-left font-black text-white text-lg w-[140px] py-0">{formatPriceInCurrency(compPrice)}</TableCell>
+
                               {/* Diff column - matches main row Diff (text-right) - empty for competitors */}
-                              <TableCell className="text-right"></TableCell>
-                              
+                              <TableCell className="text-right w-[100px]"></TableCell>
+
                               {/* Action buttons column - matches main row */}
-                              <TableCell>
+                              <TableCell className="w-[100px] py-0">
                                 <div className="flex items-center gap-2 justify-end">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    onClick={(e) => { 
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
                                       e.stopPropagation();
                                       handleEditClick(comp);
                                     }}
-                                    className="text-zinc-700 hover:text-blue-500 hover:bg-blue-500/10 transition-colors"
+                                    className="text-zinc-700 hover:text-blue-500 hover:bg-blue-500/10 transition-colors cursor-pointer"
                                   >
                                     <Pencil className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDeleteCompetitorId({ id: comp.id, name: comp.name || 'this competitor' });
+                                    }}
+                                    className="text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
                                   </Button>
                                 </div>
                               </TableCell>
@@ -488,18 +534,48 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-3 mt-6 sm:justify-center w-full">
-            <Button 
-              variant="ghost" 
-              onClick={() => setDeleteId(null)} 
+            <Button
+              variant="ghost"
+              onClick={() => setDeleteId(null)}
               className="flex-1 bg-[#111] text-zinc-300 hover:text-white hover:bg-[#222] border border-[#222]"
             >
               Cancel
             </Button>
-            <Button 
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold" 
+            <Button
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold"
               onClick={handleDeleteConfirm}
             >
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* --- 3b. DELETE COMPETITOR DIALOG --- */}
+      <Dialog open={!!deleteCompetitorId} onOpenChange={() => setDeleteCompetitorId(null)}>
+        <DialogContent className="bg-[#0a0a0a] border-[#1a1a1a] text-white sm:max-w-[425px]">
+          <DialogHeader className="flex flex-col items-center pt-4">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+              <AlertCircle className="text-red-500 w-6 h-6" />
+            </div>
+            <DialogTitle className="text-xl font-bold">Remove Competitor?</DialogTitle>
+            <DialogDescription className="text-center text-zinc-400 mt-2">
+              Are you sure you want to remove "{deleteCompetitorId?.name}" from the mapping group? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-3 mt-6 sm:justify-center w-full">
+            <Button
+              variant="ghost"
+              onClick={() => setDeleteCompetitorId(null)}
+              className="flex-1 bg-[#111] text-zinc-300 hover:text-white hover:bg-[#222] border border-[#222]"
+            >
+              Cancel
+            </Button>
+            <Button
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+              onClick={handleDeleteCompetitorConfirm}
+            >
+              Remove
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -511,7 +587,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Edit Product</DialogTitle>
             <DialogDescription className="text-zinc-400 mt-2">
-              Update the product name, brand, and website URL.
+              Update the product details below.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -542,18 +618,46 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                 placeholder="https://example.com/product"
               />
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-300">Image URL</label>
+              <Input
+                value={editForm.imageUrl}
+                onChange={(e) => setEditForm({ ...editForm, imageUrl: e.target.value })}
+                className="bg-transparent border-[var(--color-black-border)] text-[var(--color-black-text)] placeholder:text-[var(--color-black-text-muted)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 focus-visible:ring-2 focus-visible:outline-none"
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-300">Price (USD)</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">$</span>
+                <Input
+                  type="text"
+                  value={editForm.priceUSD}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty or formatted number with max 3 decimals
+                    if (val === '' || /^\d*\.?\d{0,3}$/.test(val)) {
+                      setEditForm({ ...editForm, priceUSD: val });
+                    }
+                  }}
+                  className="pl-7 bg-transparent border-[var(--color-black-border)] text-[var(--color-black-text)] placeholder:text-[var(--color-black-text-muted)] focus-visible:border-[var(--color-red-primary)] focus-visible:ring-[var(--color-red-primary)]/20 focus-visible:ring-2 focus-visible:outline-none appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  placeholder="0.000"
+                />
+              </div>
+            </div>
           </div>
           <DialogFooter className="flex gap-3 mt-6">
-            <Button 
-              variant="ghost" 
-              onClick={() => setEditProduct(null)} 
+            <Button
+              variant="ghost"
+              onClick={() => setEditProduct(null)}
               className="flex-1 bg-[#111] text-zinc-300 hover:text-white hover:bg-[#222] border border-[#222]"
               disabled={isSaving}
             >
               Cancel
             </Button>
-            <Button 
-              className="flex-1 bg-[#e11d48] hover:bg-[#be185d] text-white font-bold" 
+            <Button
+              className="flex-1 bg-[#e11d48] hover:bg-[#be185d] text-white font-bold"
               onClick={handleEditSave}
               disabled={isSaving}
             >
@@ -570,13 +674,13 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
           const mainProduct = group.mainProduct || group;
           return mainProduct.id === addCompetitorMainProductId;
         });
-        
+
         if (!productGroup) {
           return null;
         }
 
         const mainProduct = productGroup.mainProduct || productGroup;
-        
+
         if (!mainProduct.canonicalProductId) {
           return null;
         }

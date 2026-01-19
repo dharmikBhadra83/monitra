@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 
 /**
  * PATCH /api/products/update
- * Updates a product's name, brand, and/or URL
+ * Updates a product's name, brand, URL, image URL, and price
  */
 export async function PATCH(req: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { productId, name, brand, url } = body;
+    const { productId, name, brand, url, imageUrl, priceUSD } = body;
 
     if (!productId) {
       return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
@@ -43,6 +43,26 @@ export async function PATCH(req: NextRequest) {
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
     if (brand !== undefined) updateData.brand = brand;
+    if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+
+    // Handle Price Update
+    if (priceUSD !== undefined) {
+      updateData.priceUSD = priceUSD;
+      // Note: We might want to update latestPrice too if currency is USD, but for now focusing on standardized price
+      updateData.latestPrice = priceUSD;
+      updateData.currency = 'USD'; // Forcing USD since input is explicitly USD
+
+      // Add a log entry for history
+      await prisma.priceLog.create({
+        data: {
+          productId: productId,
+          price: priceUSD,
+          currency: 'USD',
+          priceUSD: priceUSD
+        }
+      });
+    }
+
     if (url !== undefined && url !== product.url) {
       // Check if new URL already exists
       const existingProduct = await prisma.product.findUnique({
