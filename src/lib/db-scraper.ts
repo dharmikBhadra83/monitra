@@ -1,7 +1,7 @@
 import { prisma } from './prisma';
 import { fetchHtml } from './scraper';
 import { scrapeProductWithSelectors, parseProductFromHtml } from './html-parser';
-import { detectSelectors } from './ai';
+import { detectSelectors, verifyPriceAndCurrency } from './ai';
 import { ProductDNA } from './types';
 import { convertToUSD } from './currency';
 import * as cheerio from 'cheerio';
@@ -24,7 +24,7 @@ export async function dbScrapeProduct(url: string): Promise<ProductDNA> {
 
     let name = '';
     let price = 0;
-    let currency = 'USD';
+    let currency = 'INR'; // Always consider currency as INR when scraping
     let brand = '';
 
     // 2. Fetch HTML content (free - no paid services)
@@ -230,6 +230,64 @@ export async function dbScrapeProduct(url: string): Promise<ProductDNA> {
         $('img').first().attr('src') ||
         undefined;
 
+    // Always set currency to INR as per requirement
+    currency = 'INR';
+    
+    // Verify price and currency using AI
+    let verifiedByAI = false;
+    let finalPrice = price;
+    let finalCurrency = currency;
+    
+    if (price > 0 && isValidPrice(price)) {
+        try {
+            console.log(`[${domain}] 🔍 AI VERIFICATION - Verifying price ${price} ${currency}`);
+            const verification = await verifyPriceAndCurrency(html, url, price, currency);
+            
+            // Decision tree for handling price mismatches
+            if (verification.verified) {
+                // Perfect match - use scraped price
+                verifiedByAI = true;
+                finalPrice = price;
+                finalCurrency = currency;
+                console.log(`[${domain}] ✅ AI VERIFICATION PASSED - Price and currency verified (using scraped: ${price} ${currency})`);
+            } else if (verification.recommendation === 'use_ai') {
+                // High confidence AI extraction - use AI price
+                if (verification.aiPrice && verification.aiCurrency) {
+                    verifiedByAI = true; // AI verified, but we're using AI's value
+                    finalPrice = verification.aiPrice;
+                    finalCurrency = verification.aiCurrency.toUpperCase();
+                    console.log(`[${domain}] 🔄 USING AI PRICE - Scraped: ${price} ${currency}, AI: ${finalPrice} ${finalCurrency} (Confidence: ${verification.confidence}, Diff: ${verification.priceDifference?.toFixed(2)}%)`);
+                } else {
+                    verifiedByAI = false;
+                    finalPrice = price;
+                    finalCurrency = currency;
+                    console.log(`[${domain}] ⚠️ AI VERIFICATION FAILED - No AI price returned, using scraped: ${price} ${currency}`);
+                }
+            } else if (verification.recommendation === 'manual_review') {
+                // Large difference or medium confidence - flag for review but use scraped for now
+                verifiedByAI = false;
+                finalPrice = price;
+                finalCurrency = currency;
+                console.log(`[${domain}] ⚠️ MANUAL REVIEW NEEDED - Scraped: ${price} ${currency}, AI: ${verification.aiPrice} ${verification.aiCurrency} (Confidence: ${verification.confidence}, Diff: ${verification.priceDifference?.toFixed(2)}%) - Using scraped value`);
+            } else {
+                // Low confidence or recommendation to use scraped
+                verifiedByAI = false;
+                finalPrice = price;
+                finalCurrency = currency;
+                console.log(`[${domain}] ⚠️ AI VERIFICATION FAILED - Low confidence or recommendation to use scraped. Scraped: ${price} ${currency}, AI: ${verification.aiPrice} ${verification.aiCurrency} (Confidence: ${verification.confidence})`);
+            }
+        } catch (error: any) {
+            console.warn(`[${domain}] ❌ AI verification failed:`, error.message);
+            verifiedByAI = false;
+            finalPrice = price;
+            finalCurrency = currency;
+        }
+    }
+    
+    // Update price and currency with final values
+    price = finalPrice;
+    currency = finalCurrency;
+
     const priceUSD = convertToUSD(price, currency);
 
     // Create dna object for return (if not already created by AI)
@@ -244,7 +302,12 @@ export async function dbScrapeProduct(url: string): Promise<ProductDNA> {
             description: '',
             imageUrl,
             url,
+            verifiedByAI,
         };
+    } else {
+        // Update existing dna with verification status
+        dna.verifiedByAI = verifiedByAI;
+        dna.currency = currency; // Ensure currency is always INR
     }
 
     // 7. Return scraped data (NO database operations here - handled in route files)

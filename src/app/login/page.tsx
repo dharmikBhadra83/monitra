@@ -18,11 +18,9 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (status === 'authenticated') {
-      router.push('/');
+      router.push('/dashboard');
     }
   }, [status, router]);
-
-  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Check for error in URL params
   useEffect(() => {
@@ -38,10 +36,9 @@ export default function LoginPage() {
   }, []);
 
   const handleGoogleSignIn = async () => {
-    if (!termsAccepted) return;
     setLoading(true);
     try {
-      await signIn('google', { callbackUrl: '/' });
+      await signIn('google', { callbackUrl: '/dashboard' });
     } catch (error: any) {
       console.error('Sign in error:', error);
       alert(`Sign in failed: ${error.message || 'Unknown error'}. Please check your configuration.`);
@@ -111,13 +108,13 @@ export default function LoginPage() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-3"
+              className="mb-4 p-4 rounded-lg bg-green-500/10 border border-green-500/20 flex items-start gap-3"
             >
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-red-500 mb-1">Configuration Error</p>
-                <p className="text-xs text-red-400">{error}</p>
-                <p className="text-xs text-red-300 mt-2">
+                <p className="text-sm font-semibold text-green-500 mb-1">Configuration Error</p>
+                <p className="text-xs text-green-400">{error}</p>
+                <p className="text-xs text-green-300 mt-2">
                   Please check your .env.local file and ensure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and NEXTAUTH_SECRET are set.
                 </p>
               </div>
@@ -132,8 +129,8 @@ export default function LoginPage() {
           >
             <Button
               onClick={handleGoogleSignIn}
-              disabled={loading || !!error || !termsAccepted}
-              className="w-full h-14 bg-[var(--color-black-card)] hover:bg-[var(--color-black-card-hover)] border-2 border-[var(--color-black-border)] hover:border-[var(--color-red-border)] text-[var(--color-black-text)] font-semibold text-base transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading || !!error}
+              className="cursor-pointer w-full h-14 bg-[var(--color-black-card)] hover:bg-[var(--color-black-card-hover)] border-2 border-[var(--color-black-border)] hover:border-[var(--color-red-border)] text-[var(--color-black-text)] font-semibold text-base transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -147,38 +144,6 @@ export default function LoginPage() {
                 </>
               )}
             </Button>
-          </motion.div>
-
-          {/* Info Text with Checkbox */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-6"
-          >
-            <label className="flex items-start gap-3 cursor-pointer group">
-              <div className="relative flex items-center mt-0.5">
-                <input
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-[var(--color-black-border)] bg-transparent transition-all checked:border-[var(--color-red-primary)] checked:bg-[var(--color-red-primary)]"
-                />
-                <svg
-                  className="pointer-events-none absolute h-3.5 w-3.5 fill-white opacity-0 transition-opacity peer-checked:opacity-100 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <p className="text-xs text-[var(--color-black-text-secondary)] leading-tight select-none pt-0.5">
-                By signing in, I agree to the <span className="text-[var(--color-red-primary)] hover:underline">Terms of Service</span> and <span className="text-[var(--color-red-primary)] hover:underline">Privacy Policy</span>
-              </p>
-            </label>
           </motion.div>
 
           {/* Decorative Elements */}

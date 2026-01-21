@@ -158,7 +158,7 @@ export function DashboardView({
               {kpi.priceIndex < 100 ? (
                 <Badge variant="secondary" className="bg-green-500/10 text-green-500">Competitive</Badge>
               ) : (
-                <Badge variant="secondary" className="bg-red-500/10 text-red-500">Premium</Badge>
+                <Badge variant="secondary" className="bg-green-500/10 text-green-500">Premium</Badge>
               )}
             </div>
             <div className="flex items-end gap-2">
@@ -174,15 +174,15 @@ export function DashboardView({
 
       {/* Hot Actions Today */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6 bg-[var(--color-black-card)] border-2 border-red-900/50 hover:border-red-500/50 transition-all col-span-3">
+        <Card className="p-6 bg-[var(--color-black-card)] border-2 border-green-900/50 hover:border-green-500/50 transition-all col-span-3">
           <h3 className="text-lg font-bold text-[var(--color-black-text)] mb-4 flex items-center gap-2">
             <Zap className="w-5 h-5 text-yellow-500" />
             Hot Actions Today
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-start gap-4 p-4 rounded-lg bg-[var(--color-black-card-hover)]/30">
-              <div className="p-2 bg-red-500/10 rounded-full">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
+              <div className="p-2 bg-green-500/10 rounded-full">
+                <AlertTriangle className="w-5 h-5 text-green-500" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-[var(--color-black-text)]">{hotActions?.expensiveAlerts || 0}</p>
@@ -243,8 +243,8 @@ export function DashboardView({
         <Card className="p-6 bg-[var(--color-black-card)] border border-[var(--color-black-border)]">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium text-[var(--color-black-text-muted)]">Expensive</p>
-            <div className="p-1.5 bg-red-500/10 rounded">
-              <TrendingUp className="w-4 h-4 text-red-500" />
+            <div className="p-1.5 bg-green-500/10 rounded">
+              <TrendingUp className="w-4 h-4 text-green-500" />
             </div>
           </div>
           <h3 className="text-3xl font-bold text-[var(--color-black-text)]">{segmentation?.expensive || 0}</h3>
@@ -363,7 +363,7 @@ export function DashboardView({
                       {/* Timeline Line */}
                       <div className="absolute left-0 top-2 bottom-0 w-px bg-[var(--color-black-border)]" />
                       {/* Dot */}
-                      <div className={`absolute left-[-4px] top-2 w-2 h-2 rounded-full ${isIncrease ? 'bg-red-500' : 'bg-green-500'}`} />
+                      <div className={`absolute left-[-4px] top-2 w-2 h-2 rounded-full ${isIncrease ? 'bg-green-500' : 'bg-green-500'}`} />
 
                       <div className="mb-1">
                         <p className="text-sm font-medium text-[var(--color-black-text)] line-clamp-2">
@@ -373,8 +373,8 @@ export function DashboardView({
                           <span className="text-xs text-[var(--color-black-text-muted)] line-through">
                             {formatPrice(convertFromUSD(activity.oldPrice, selectedCurrency), selectedCurrency)}
                           </span>
-                          <ArrowUpRight className={`w-3 h-3 ${isIncrease ? 'text-red-500' : 'text-green-500 rotate-90'}`} />
-                          <span className={`text-xs font-bold ${isIncrease ? 'text-red-500' : 'text-green-500'}`}>
+                          <ArrowUpRight className={`w-3 h-3 ${isIncrease ? 'text-green-500' : 'text-green-500 rotate-90'}`} />
+                          <span className={`text-xs font-bold ${isIncrease ? 'text-green-500' : 'text-green-500'}`}>
                             {formatPrice(convertFromUSD(activity.newPrice, selectedCurrency), selectedCurrency)}
                           </span>
                         </div>

@@ -18,14 +18,27 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Main product URL is required' }, { status: 400 });
         }
 
-        // 1. Check all products (main + competitors) to ensure they all have canonicalProductId null
+        // 1. Get user quota information
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { urlQuota: true, urlUsed: true }
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        // 2. Check only products owned by this user to ensure they don't already have canonicalProductId
         const allUrls = [mainUrl, ...competitorUrls.filter((u: string) => u.trim() !== '')];
         const existingProducts = await prisma.product.findMany({
-            where: { url: { in: allUrls } } as any,
-            select: { url: true, canonicalProductId: true } as any
+            where: { 
+                url: { in: allUrls },
+                userId: userId // Only check products owned by this user
+            } as any,
+            select: { url: true, canonicalProductId: true, userId: true } as any
         }) as any[];
 
-        // Check if any product already has a canonicalProductId (already in a mapping)
+        // Check if any product owned by this user already has a canonicalProductId (already in a mapping)
         const productsInMapping = existingProducts.filter((p: any) => p.canonicalProductId !== null);
         
         if (productsInMapping.length > 0) {
@@ -36,11 +49,34 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        // 3. Count new URLs that will be created (excluding existing ones owned by this user)
+        const existingUrls = existingProducts
+            .filter((p: any) => p.userId === userId)
+            .map((p: any) => p.url);
+        const newUrls = allUrls.filter((url: string) => !existingUrls.includes(url));
+        const newUrlCount = newUrls.length;
+
+        // 4. Check quota before proceeding
+        if (user.urlUsed + newUrlCount > user.urlQuota) {
+            const remaining = user.urlQuota - user.urlUsed;
+            return NextResponse.json(
+                { 
+                    error: 'URL quota exceeded',
+                    quotaExceeded: true,
+                    urlUsed: user.urlUsed,
+                    urlQuota: user.urlQuota,
+                    remaining: remaining,
+                    requested: newUrlCount
+                },
+                { status: 403 }
+            );
+        }
+
         // 2. Scrape main product - get scraped data only (no DB operations)
         const mainProductDna = await dbScrapeProduct(mainUrl);
         // Round price to 3 decimal places and convert to USD
         const roundedPrice = roundTo3Decimals(mainProductDna.price);
-        const priceUSD = convertToUSD(roundedPrice, mainProductDna.currency || 'USD');
+        const priceUSD = convertToUSD(roundedPrice, mainProductDna.currency || 'INR');
 
         // 3. Create CanonicalProduct for new mapping (auto-increment id)
         const canonicalProduct = await (prisma as any).canonicalProduct.create({
@@ -58,7 +94,8 @@ export async function POST(req: NextRequest) {
                 brand: mainProductDna.brand || '',
                 latestPrice: roundedPrice,
                 priceUSD: priceUSD,
-                currency: mainProductDna.currency || 'USD',
+                currency: mainProductDna.currency || 'INR',
+                verifiedByAI: mainProductDna.verifiedByAI || false,
                 imageUrl: mainProductDna.imageUrl,
             } as any
         }) as any;
@@ -79,9 +116,12 @@ export async function POST(req: NextRequest) {
                 .filter((u: string) => u.trim() !== '')
                 .map(async (url: string) => {
                     try {
-                        // Check if competitor already exists in any mapping
-                        const existingCompetitor = await prisma.product.findUnique({ 
-                            where: { url } 
+                        // Check if competitor already exists in a mapping for this user
+                        const existingCompetitor = await prisma.product.findFirst({ 
+                            where: { 
+                                url: url,
+                                userId: userId
+                            } 
                         }) as any;
 
                         if (existingCompetitor?.canonicalProductId) {
@@ -92,7 +132,7 @@ export async function POST(req: NextRequest) {
                         const competitorDna = await dbScrapeProduct(url);
                         // Round price to 3 decimal places and convert to USD
                         const roundedCompetitorPrice = roundTo3Decimals(competitorDna.price);
-                        const competitorPriceUSD = convertToUSD(roundedCompetitorPrice, competitorDna.currency || 'USD');
+                        const competitorPriceUSD = convertToUSD(roundedCompetitorPrice, competitorDna.currency || 'INR');
                         
                         // Create competitor product for this new mapping
                         const competitorProduct = await prisma.product.create({
@@ -104,7 +144,8 @@ export async function POST(req: NextRequest) {
                                 brand: competitorDna.brand || '',
                                 latestPrice: roundedCompetitorPrice,
                                 priceUSD: competitorPriceUSD,
-                                currency: competitorDna.currency || 'USD',
+                                currency: competitorDna.currency || 'INR',
+                                verifiedByAI: competitorDna.verifiedByAI || false,
                                 imageUrl: competitorDna.imageUrl,
                             } as any
                         }) as any;
@@ -128,6 +169,17 @@ export async function POST(req: NextRequest) {
         );
 
         const validCompetitors = competitorProducts.filter((p): p is any => p !== null);
+
+        // 7. Update user's urlUsed count
+        const actualCreatedCount = 1 + validCompetitors.length; // main product + valid competitors
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                urlUsed: {
+                    increment: actualCreatedCount
+                }
+            }
+        });
 
         return NextResponse.json({
             success: true,

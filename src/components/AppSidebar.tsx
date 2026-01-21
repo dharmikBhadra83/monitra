@@ -60,19 +60,19 @@ export function AppSidebar({ activeTab, onTabChange, ...props }: AppSidebarProps
             </div>
             {state === "expanded" && (
               <span className="font-bold text-lg tracking-tight text-[var(--color-black-text)]">
-                Compi-AI
+                Monitra
               </span>
             )}
           </div>
         </SidebarHeader>
 
         <SidebarContent className="overflow-hidden">
-          <nav 
-            className="relative p-2 overflow-hidden" 
-            style={{ 
-              '--main-color': 'var(--color-red-primary)', 
-              '--main-color-opacity': 'var(--color-red-opacity)', 
-              '--total-radio': navItems.length 
+          <nav
+            className="relative p-2 overflow-hidden"
+            style={{
+              '--main-color': 'var(--color-red-primary)',
+              '--main-color-opacity': 'var(--color-red-opacity)',
+              '--total-radio': navItems.length
             } as React.CSSProperties}
           >
             <div className="radio-nav-container overflow-hidden">
@@ -108,18 +108,18 @@ export function AppSidebar({ activeTab, onTabChange, ...props }: AppSidebarProps
           </nav>
         </SidebarContent>
 
-      <SidebarFooter className="border-t border-[var(--color-black-border)]">
-        <div className="flex w-full items-center justify-center px-2 py-4">
-          <Button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            className="h-9 bg-black hover:bg-black/80 border-2 border-[var(--color-red-primary)] text-[var(--color-red-primary)] font-medium text-xs rounded-full transition-all flex items-center justify-center gap-2 group shadow-lg"
-            style={{ width: state === "expanded" ? "100%" : "2.5rem" }}
-          >
-            <X className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform shrink-0" />
-            {state === "expanded" && <span>Logout</span>}
-          </Button>
-        </div>
-      </SidebarFooter>
+        <SidebarFooter className="border-t border-[var(--color-black-border)]">
+          <div className="flex w-full items-center justify-center px-2 py-4">
+            <Button
+              onClick={() => signOut({ callbackUrl: '/login' })}
+              className="h-9 cursor-pointer  bg-black hover:bg-black/80 border-2 border-[var(--color-red-primary)] text-[var(--color-red-primary)] font-medium text-xs rounded-full transition-all flex items-center justify-center gap-2 group shadow-lg"
+              style={{ width: state === "expanded" ? "100%" : "2.5rem" }}
+            >
+              <X className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform shrink-0" />
+              {state === "expanded" && <span>Logout</span>}
+            </Button>
+          </div>
+        </SidebarFooter>
 
         <SidebarRail />
       </Sidebar>

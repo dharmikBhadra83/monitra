@@ -25,11 +25,11 @@ export function CompetitorTable({ competitors }: CompetitorTableProps) {
         const avgPrice = allPrices.reduce((a, b) => a + b, 0) / allPrices.length;
         
         if (competitor.price === minPrice) {
-            return { status: 'cheapest', color: '#f43f5e' }; // You are cheapest
+            return { status: 'cheapest', color: '#22c55e' }; // You are cheapest
         } else if (competitor.price <= avgPrice * 1.1) {
-            return { status: 'slightly-higher', color: '#f43f5e' }; // Slightly higher
+            return { status: 'slightly-higher', color: '#22c55e' }; // Slightly higher
         } else {
-            return { status: 'overpriced', color: '#f43f5e' }; // Overpriced
+            return { status: 'overpriced', color: '#22c55e' }; // Overpriced
         }
     };
 
@@ -81,7 +81,7 @@ export function CompetitorTable({ competitors }: CompetitorTableProps) {
                                             className="h-full rounded-full"
                                             style={{ 
                                                 width: `${Math.round(competitor.similarityScore * 100)}%`,
-                                                backgroundColor: '#f43f5e'
+                                                backgroundColor: '#22c55e'
                                             }}
                                         />
                                     </div>
@@ -95,7 +95,7 @@ export function CompetitorTable({ competitors }: CompetitorTableProps) {
                                     href={competitor.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-[#9CA3AF] hover:text-[#f43f5e] transition-colors inline-flex items-center gap-1 text-xs"
+                                    className="text-[#9CA3AF] hover:text-[#22c55e] transition-colors inline-flex items-center gap-1 text-xs"
                                 >
                                     View Store
                                     <ExternalLink className="w-3 h-3" />

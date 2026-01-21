@@ -214,6 +214,127 @@ export async function validateCompetitor(
 }
 
 /**
+ * Verifies the scraped price and currency using AI cross-checking.
+ * Returns true if AI confirms the price and currency match, false otherwise.
+ */
+export async function verifyPriceAndCurrency(
+  html: string,
+  url: string,
+  scrapedPrice: number,
+  scrapedCurrency: string
+): Promise<{ 
+  verified: boolean; 
+  aiPrice?: number; 
+  aiCurrency?: string;
+  confidence?: number;
+  priceDifference?: number;
+  recommendation?: 'use_scraped' | 'use_ai' | 'manual_review';
+}> {
+  const parser = new JsonOutputParser<{ price: number; currency: string; confidence: number }>();
+  
+  const prompt = PromptTemplate.fromTemplate(`
+    You are a price verification expert. Your task is to verify the price and currency extracted from a product page.
+    
+    URL: {url}
+    Scraped Price: {scrapedPrice}
+    Scraped Currency: {scrapedCurrency}
+    
+    HTML Content (first 15000 chars): {content}
+    
+    INSTRUCTIONS:
+    1. Extract the ACTUAL product price and currency from the HTML content
+    2. Compare the extracted price with the scraped price
+    3. Compare the extracted currency with the scraped currency
+    4. Return your findings with a confidence score (0-1)
+    
+    IMPORTANT:
+    - Look for the main product price (not discounts, fees, or shipping costs)
+    - Identify the currency symbol or code (₹ = INR, $ = USD, € = EUR, £ = GBP, ¥ = JPY)
+    - For Indian websites, the currency is typically INR (₹)
+    - Extract the price as a NUMBER (handle formats like "₹88,00", "88.00", "88,00" as 88.00)
+    - Be careful with comma separators:
+      * Indian format: "88,00" or "₹88,00" means 88.00 (comma is decimal separator)
+      * Western format: "88,000" means 88000 (comma is thousands separator)
+      * If you see "₹88,00" or "88,00" with only 2 digits after comma, treat comma as decimal separator → 88.00
+      * If you see "₹88,000" or "88,000" with 3+ digits after comma, treat comma as thousands separator → 88000
+    
+    Return a JSON object:
+    {{
+      "price": number (the price you extracted),
+      "currency": "string" (currency code: INR, USD, EUR, GBP, JPY, etc.),
+      "confidence": number (0-1, how confident you are in the extraction)
+    }}
+    
+    If the extracted price matches the scraped price (within 1% tolerance) AND currency matches, 
+    the verification should be considered successful.
+  `);
+
+  const chain = prompt.pipe(model).pipe(parser);
+  
+  console.log(`[AI] 🤖 verifyPriceAndCurrency - Verifying price ${scrapedPrice} ${scrapedCurrency} for ${url}`);
+  
+  try {
+    const content = cheerio.load(html).text().substring(0, 15000);
+    const result = await chain.invoke({
+      url,
+      scrapedPrice,
+      scrapedCurrency,
+      content
+    });
+    
+    // Check if price matches (within 1% tolerance)
+    const priceDiff = Math.abs(result.price - scrapedPrice);
+    const priceTolerance = Math.max(scrapedPrice * 0.01, 0.01); // 1% or minimum 0.01
+    const priceMatches = priceDiff <= priceTolerance;
+    const priceDiffPercent = (priceDiff / scrapedPrice) * 100;
+    
+    // Check if currency matches (case-insensitive)
+    const currencyMatches = result.currency.toUpperCase() === scrapedCurrency.toUpperCase();
+    
+    const verified = priceMatches && currencyMatches && result.confidence >= 0.7;
+    
+    // Determine recommendation based on confidence and difference
+    let recommendation: 'use_scraped' | 'use_ai' | 'manual_review' = 'use_scraped';
+    
+    if (verified) {
+      recommendation = 'use_scraped'; // Both match, use scraped (it's faster)
+    } else if (result.confidence >= 0.9 && priceDiffPercent <= 5) {
+      // High confidence, small difference - trust AI
+      recommendation = 'use_ai';
+    } else if (result.confidence >= 0.8 && priceDiffPercent <= 10) {
+      // Good confidence, moderate difference - use AI
+      recommendation = 'use_ai';
+    } else if (result.confidence >= 0.7 && priceDiffPercent > 10) {
+      // Medium confidence, large difference - manual review
+      recommendation = 'manual_review';
+    } else if (result.confidence < 0.7) {
+      // Low confidence - stick with scraped
+      recommendation = 'use_scraped';
+    } else {
+      // Large difference regardless of confidence - manual review
+      recommendation = 'manual_review';
+    }
+    
+    console.log(`[AI] ✅ verifyPriceAndCurrency RESULT - AI Price: ${result.price} ${result.currency}, Scraped: ${scrapedPrice} ${scrapedCurrency}, Match: ${verified} (Price: ${priceMatches}, Currency: ${currencyMatches}, Confidence: ${result.confidence}, Diff: ${priceDiffPercent.toFixed(2)}%, Recommendation: ${recommendation})`);
+    
+    return {
+      verified,
+      aiPrice: result.price,
+      aiCurrency: result.currency,
+      confidence: result.confidence,
+      priceDifference: priceDiffPercent,
+      recommendation
+    };
+  } catch (error: any) {
+    console.error(`[AI] ❌ verifyPriceAndCurrency FAILED:`, error.message);
+    // If AI verification fails, return false (not verified)
+    return {
+      verified: false
+    };
+  }
+}
+
+/**
  * Converts HTML to a cleaner, token-efficient format for AI analysis.
  * Extracts structural information to handle dynamic class names.
  */

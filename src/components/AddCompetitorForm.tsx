@@ -160,7 +160,7 @@ export function AddCompetitorForm({
                           onClick={() => setCompetitorUrls(competitorUrls.filter((_, i) => i !== idx))}
                           variant="ghost"
                           size="icon"
-                          className="h-10 w-10 text-gray-500 hover:text-red-500"
+                          className="h-10 w-10 text-gray-500 hover:text-green-500"
                         >
                           <X className="w-4 h-4" />
                         </Button>
@@ -175,7 +175,7 @@ export function AddCompetitorForm({
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-sm text-red-500 font-medium bg-red-500/10 p-3 rounded-lg border border-red-500/20"
+                className="text-sm text-green-500 font-medium bg-green-500/10 p-3 rounded-lg border border-green-500/20"
               >
                 {error}
               </motion.div>

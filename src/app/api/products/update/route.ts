@@ -64,12 +64,15 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (url !== undefined && url !== product.url) {
-      // Check if new URL already exists
-      const existingProduct = await prisma.product.findUnique({
-        where: { url },
+      // Check if new URL already exists for this user
+      const existingProduct = await prisma.product.findFirst({
+        where: { 
+          url: url,
+          userId: session.user.id
+        },
       });
       if (existingProduct && existingProduct.id !== productId) {
-        return NextResponse.json({ error: 'A product with this URL already exists' }, { status: 400 });
+        return NextResponse.json({ error: 'You already have a product with this URL' }, { status: 400 });
       }
       updateData.url = url;
     }

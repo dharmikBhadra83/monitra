@@ -74,13 +74,16 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // 2. Check all URLs to ensure they don't already belong to a mapping
+        // 2. Check all URLs to ensure they don't already belong to a mapping (only for this user)
         const existingProducts = await prisma.product.findMany({
-            where: { url: { in: validUrls } } as any,
-            select: { url: true, canonicalProductId: true, userId: true } as any
+            where: { 
+                url: { in: validUrls },
+                userId: userId // Only check products owned by this user
+            } as any,
+            select: { url: true, canonicalProductId: true, userId: true, id: true } as any
         }) as any[];
 
-        // Check if any product already has a canonicalProductId (already in a mapping)
+        // Check if any product owned by this user already has a canonicalProductId (already in a mapping)
         const productsInMapping = existingProducts.filter(
             (p: any) => p.canonicalProductId !== null && p.canonicalProductId !== undefined
         );
@@ -120,10 +123,10 @@ export async function POST(req: NextRequest) {
                     
                     // Round price to 3 decimal places and convert to USD
                     const roundedPrice = roundTo3Decimals(productDna.price);
-                    const priceUSD = convertToUSD(roundedPrice, productDna.currency || 'USD');
+                    const priceUSD = convertToUSD(roundedPrice, productDna.currency || 'INR');
 
-                    // Check if product already exists (but without mapping)
-                    const existingProduct = existingProducts.find((p: any) => p.url === url);
+                    // Check if product already exists for this user (but without mapping)
+                    const existingProduct = existingProducts.find((p: any) => p.url === url && p.userId === userId);
                     
                     let product;
                     if (existingProduct && !existingProduct.canonicalProductId) {
@@ -132,12 +135,12 @@ export async function POST(req: NextRequest) {
                             where: { id: existingProduct.id } as any,
                             data: {
                                 canonicalProductId: canonicalProductId,
-                                userId: userId,
                                 name: productDna.name,
                                 brand: productDna.brand || '',
                                 latestPrice: roundedPrice,
                                 priceUSD: priceUSD,
-                                currency: productDna.currency || 'USD',
+                                currency: productDna.currency || 'INR',
+                                verifiedByAI: productDna.verifiedByAI || false,
                                 imageUrl: productDna.imageUrl,
                             } as any
                         }) as any;
@@ -152,7 +155,8 @@ export async function POST(req: NextRequest) {
                                 brand: productDna.brand || '',
                                 latestPrice: roundedPrice,
                                 priceUSD: priceUSD,
-                                currency: productDna.currency || 'USD',
+                                currency: productDna.currency || 'INR',
+                                verifiedByAI: productDna.verifiedByAI || false,
                                 imageUrl: productDna.imageUrl,
                             } as any
                         }) as any;

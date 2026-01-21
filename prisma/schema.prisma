@@ -27,12 +27,13 @@ model CanonicalProduct {
 // When a product group is deleted, products with that canonicalProductId are removed
 model Product {
   id                String           @id @default(cuid())
-  url               String           @unique
+  url               String           // URL can be duplicated across different users
   name              String
   brand             String
   latestPrice       Decimal          @db.Decimal(19, 3) // Price in original currency with 3 decimal places
-  currency          String           @default("USD")
+  currency          String           @default("INR") // Always stored as INR when scraping
   priceUSD          Decimal          @db.Decimal(19, 3) // Always stored in USD for consistent comparison with 3 decimal places
+  verifiedByAI      Boolean          @default(false) // Whether AI verified the price and currency match
   imageUrl          String?
   canonicalProductId Int?            // Links to CanonicalProduct for grouping competitive products
   canonicalProduct  CanonicalProduct? @relation(fields: [canonicalProductId], references: [id], onDelete: Cascade)
@@ -42,6 +43,7 @@ model Product {
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
+  @@unique([url, userId]) // Same URL can exist for different users, but not twice for the same user
   @@index([canonicalProductId])
   @@index([userId])
 }
@@ -96,6 +98,8 @@ model User {
   role                String?
   employeeCount       String?
   onboardingCompleted Boolean          @default(false)
+  urlQuota            Int              @default(50) // Total URLs allowed per user
+  urlUsed              Int              @default(0)  // Number of URLs currently used
   accounts            Account[]
   sessions            Session[]
   products            Product[]

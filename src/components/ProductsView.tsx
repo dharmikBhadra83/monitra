@@ -82,11 +82,11 @@ function TreeConnector({ isOpen, competitorCount }: { isOpen: boolean; competito
         strokeLinejoin="round"
       />
 
-      {/* Red Animated Liquid Path */}
+      {/* Green Animated Liquid Path */}
       <motion.path
         d={pathD}
         fill="none"
-        stroke="#e11d48"
+        stroke="#22c55e"
         strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -275,7 +275,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
           <select
             value={selectedCurrency || 'USD'}
             onChange={(e) => setSelectedCurrency && setSelectedCurrency(e.target.value)}
-            className="px-4 py-2.5 rounded-lg bg-[#111] border-2 border-[#1a1a1a] text-white text-sm font-medium cursor-pointer focus:outline-none focus:border-[#e11d48] focus:ring-2 focus:ring-[#e11d48]/20 hover:border-[#2a2a2a] hover:bg-[#151515] transition-all shadow-sm min-w-[140px] appearance-none pr-10"
+            className="px-4 py-2.5 rounded-lg bg-[#111] border-2 border-[#1a1a1a] text-white text-sm font-medium cursor-pointer focus:outline-none focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/20 hover:border-[#2a2a2a] hover:bg-[#151515] transition-all shadow-sm min-w-[140px] appearance-none pr-10"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
               backgroundRepeat: 'no-repeat',
@@ -296,7 +296,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
         {/* Add Product Button */}
         <Button
           onClick={() => onAddProduct && onAddProduct()}
-          className="bg-[#e11d48] hover:bg-[#be185d] text-white font-bold px-6 py-2 rounded-lg transition-colors cursor-pointer"
+          className="bg-[#22c55e] hover:bg-[#16a34a] text-white font-bold px-6 py-2 rounded-lg transition-colors cursor-pointer"
         >
           + Add Product
         </Button>
@@ -338,7 +338,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                   >
                     <TableCell className="w-[100px] py-0">
                       <div className="flex items-center gap-4 ml-4">
-                        {isExpanded ? <ChevronDown className="w-4 h-4 text-[#e11d48]" /> : <ChevronRight className="w-4 h-4 text-zinc-600" />}
+                        {isExpanded ? <ChevronDown className="w-4 h-4 text-[#22c55e]" /> : <ChevronRight className="w-4 h-4 text-zinc-600" />}
                         <div className="w-10 h-10 rounded-lg bg-[#111] border border-[#222] overflow-hidden shrink-0 relative z-10">
                           <img src={mainProduct?.imageUrl} className="w-full h-full object-contain" alt="" />
                         </div>
@@ -360,7 +360,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-zinc-400 hover:text-[#e11d48] transition-colors flex items-center gap-1 truncate"
+                          className="text-zinc-400 hover:text-[#22c55e] transition-colors flex items-center gap-1 truncate"
                         >
                           {getDomainFromUrl(mainProduct.url)}
                           <ExternalLink className="w-3 h-3 shrink-0" />
@@ -370,7 +370,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                       )}
                     </TableCell>
                     <TableCell className="text-left font-black text-white text-lg w-[140px] py-0">{formatPriceInCurrency(mainPrice)}</TableCell>
-                    <TableCell className="text-right font-bold text-[#e11d48] w-[100px] py-0">{diffText}</TableCell>
+                    <TableCell className="text-right font-bold text-[#22c55e] w-[100px] py-0">{diffText}</TableCell>
                     <TableCell className="w-[100px] py-0">
                       <div className="flex items-center gap-2 justify-end">
                         <Button
@@ -403,7 +403,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                             // Use canonicalProductId if available, otherwise use product id
                             setDeleteId(mainProduct.canonicalProductId?.toString() || mainProduct.id);
                           }}
-                          className="text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                          className="text-zinc-700 hover:text-green-500 hover:bg-green-500/10 transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -464,7 +464,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                                     href={comp.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-zinc-400 hover:text-[#e11d48] transition-colors flex items-center gap-1 truncate"
+                                    className="text-zinc-400 hover:text-[#22c55e] transition-colors flex items-center gap-1 truncate"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     {getDomainFromUrl(comp.url)}
@@ -502,7 +502,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                                       e.stopPropagation();
                                       setDeleteCompetitorId({ id: comp.id, name: comp.name || 'this competitor' });
                                     }}
-                                    className="text-zinc-700 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                                    className="text-zinc-700 hover:text-green-500 hover:bg-green-500/10 transition-colors cursor-pointer"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
@@ -525,8 +525,8 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="bg-[#0a0a0a] border-[#1a1a1a] text-white sm:max-w-[425px]">
           <DialogHeader className="flex flex-col items-center pt-4">
-            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-              <AlertCircle className="text-red-500 w-6 h-6" />
+            <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
+              <AlertCircle className="text-green-500 w-6 h-6" />
             </div>
             <DialogTitle className="text-xl font-bold">Delete Product?</DialogTitle>
             <DialogDescription className="text-center text-zinc-400 mt-2">
@@ -542,7 +542,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
               Cancel
             </Button>
             <Button
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold"
               onClick={handleDeleteConfirm}
             >
               Delete
@@ -555,8 +555,8 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
       <Dialog open={!!deleteCompetitorId} onOpenChange={() => setDeleteCompetitorId(null)}>
         <DialogContent className="bg-[#0a0a0a] border-[#1a1a1a] text-white sm:max-w-[425px]">
           <DialogHeader className="flex flex-col items-center pt-4">
-            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-              <AlertCircle className="text-red-500 w-6 h-6" />
+            <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
+              <AlertCircle className="text-green-500 w-6 h-6" />
             </div>
             <DialogTitle className="text-xl font-bold">Remove Competitor?</DialogTitle>
             <DialogDescription className="text-center text-zinc-400 mt-2">
@@ -572,7 +572,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
               Cancel
             </Button>
             <Button
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold"
               onClick={handleDeleteCompetitorConfirm}
             >
               Remove
@@ -657,7 +657,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
               Cancel
             </Button>
             <Button
-              className="flex-1 bg-[#e11d48] hover:bg-[#be185d] text-white font-bold"
+              className="flex-1 bg-[#22c55e] hover:bg-[#16a34a] text-white font-bold"
               onClick={handleEditSave}
               disabled={isSaving}
             >

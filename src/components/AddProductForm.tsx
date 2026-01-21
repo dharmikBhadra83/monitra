@@ -10,11 +10,13 @@ import { Plus, X, Target, Layers, RefreshCw, Zap } from 'lucide-react';
 interface AddProductFormProps {
   onClose: () => void;
   onSuccess: () => void;
+  onQuotaExceeded?: () => void;
 }
 
 export function AddProductForm({
   onClose,
-  onSuccess
+  onSuccess,
+  onQuotaExceeded
 }: AddProductFormProps) {
   const [mainUrl, setMainUrl] = useState('');
   const [competitorUrls, setCompetitorUrls] = useState<string[]>(['']);
@@ -59,6 +61,13 @@ export function AddProductForm({
 
       const data = await res.json();
       if (!res.ok) {
+        // Check if quota is exceeded
+        if (res.status === 403 && data.quotaExceeded && onQuotaExceeded) {
+          onQuotaExceeded();
+          setError(data.error || 'URL quota exceeded. Please upgrade your plan to add more URLs.');
+          setLoading(false);
+          return;
+        }
         throw new Error(data.error || 'Failed to add product');
       }
 
@@ -129,6 +138,9 @@ export function AddProductForm({
                 <label className="text-sm font-semibold text-[var(--color-black-text)] flex items-center gap-2">
                   <Layers className="w-4 h-4 text-[var(--color-red-primary)]" />
                   Competitor URLs
+                  <span className="text-xs font-normal text-[var(--color-black-text-muted)] ml-2">
+                    ({competitorUrls.filter(u => u.trim() !== '').length}/50)
+                  </span>
                 </label>
                 <motion.div
                   whileHover={{ y: -2 }}
@@ -136,15 +148,30 @@ export function AddProductForm({
                 >
                   <Button
                     type="button"
-                    onClick={() => setCompetitorUrls([...competitorUrls, ''])}
+                    onClick={() => {
+                      const filledUrls = competitorUrls.filter(u => u.trim() !== '');
+                      if (filledUrls.length < 50) {
+                        setCompetitorUrls([...competitorUrls, '']);
+                      }
+                    }}
+                    disabled={competitorUrls.filter(u => u.trim() !== '').length >= 50}
                     variant="outline"
                     size="sm"
-                    className="text-xs h-8 border-[var(--color-red-primary)] text-[var(--color-red-primary)] hover:bg-[var(--color-red-opacity)] shadow-sm"
+                    className="text-xs h-8 border-[var(--color-red-primary)] text-[var(--color-red-primary)] hover:bg-[var(--color-red-opacity)] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:border-[var(--color-black-border)] disabled:text-[var(--color-black-text-muted)]"
                   >
                     <Plus className="w-3 h-3 mr-1" /> Add URL
                   </Button>
                 </motion.div>
               </div>
+              {competitorUrls.filter(u => u.trim() !== '').length >= 50 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs text-[var(--color-black-text-muted)] bg-[var(--color-black-card)] border border-[var(--color-black-border)] rounded-lg px-3 py-2"
+                >
+                  Maximum limit of 50 competitor URLs reached.
+                </motion.div>
+              )}
 
               <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                 <AnimatePresence>
@@ -173,7 +200,7 @@ export function AddProductForm({
                           onClick={() => setCompetitorUrls(competitorUrls.filter((_, i) => i !== idx))}
                           variant="ghost"
                           size="icon"
-                          className="h-10 w-10 text-gray-500 hover:text-red-500"
+                          className="h-10 w-10 text-gray-500 hover:text-green-500"
                         >
                           <X className="w-4 h-4" />
                         </Button>
@@ -188,7 +215,7 @@ export function AddProductForm({
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-sm text-red-500 font-medium bg-red-500/10 p-3 rounded-lg border border-red-500/20"
+                className="text-sm text-green-500 font-medium bg-green-500/10 p-3 rounded-lg border border-green-500/20"
               >
                 {error}
               </motion.div>

@@ -21,6 +21,7 @@ export default function OnboardingPage() {
         role: '',
         employeeCount: '',
     });
+    const [termsAccepted, setTermsAccepted] = useState(false);
 
     useEffect(() => {
         if (session?.user?.name) {
@@ -41,7 +42,7 @@ export default function OnboardingPage() {
                 session.user.name;
 
             if (hasCompletedProfile) {
-                router.push('/');
+                router.push('/dashboard');
             }
         }
     }, [session, router]);
@@ -68,7 +69,7 @@ export default function OnboardingPage() {
             if (response.ok) {
                 // Update session to reflect completed onboarding
                 await update();
-                router.push('/');
+                router.push('/dashboard');
             } else {
                 const error = await response.json();
                 alert(`Error: ${error.error}`);
@@ -145,7 +146,7 @@ export default function OnboardingPage() {
                                 exit={{ opacity: 0, x: -20 }}
                             >
                                 <h2 className="text-3xl font-bold text-white mb-2 text-center">Complete Your Profile</h2>
-                                <p className="text-[var(--color-black-text-muted)] text-center mb-10">Tailoring Compi-AI to your business needs.</p>
+                                <p className="text-[var(--color-black-text-muted)] text-center mb-10">Tailoring Monitra to your business needs.</p>
 
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div className="space-y-2">
@@ -215,9 +216,36 @@ export default function OnboardingPage() {
                                         </div>
                                     </div>
 
+                                    {/* Terms and Conditions Checkbox */}
+                                    <div className="mt-6">
+                                        <label className="flex items-start ml-6 gap-3 cursor-pointer group">
+                                            <div className="relative flex items-center shrink-0 mt-[2px]">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={termsAccepted}
+                                                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                                                    className="peer  h-5 w-5 cursor-pointer appearance-none rounded border-2 border-[var(--color-black-border)] bg-transparent transition-all checked:border-[var(--color-red-primary)] checked:bg-[var(--color-red-primary)]"
+                                                />
+                                                <svg
+                                                    className="pointer-events-none absolute h-3.5 w-3.5 fill-white opacity-0 transition-opacity peer-checked:opacity-100 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                        clipRule="evenodd"
+                                                    />
+                                                </svg>
+                                            </div>
+                                            <p className="text-xs text-[var(--color-black-text-secondary)] leading-[1.6] select-none">
+                                                By completing setup, I agree to the <span className="text-[var(--color-red-primary)] hover:underline cursor-pointer">Terms of Service</span> and <span className="text-[var(--color-red-primary)] hover:underline cursor-pointer">Privacy Policy</span>
+                                            </p>
+                                        </label>
+                                    </div>
+
                                     <Button
                                         type="submit"
-                                        disabled={loading || !formData.employeeCount}
+                                        disabled={loading || !formData.employeeCount || !termsAccepted}
                                         className="w-full h-14 bg-[var(--color-red-primary)] hover:bg-[var(--color-red-primary)]/90 text-white font-bold text-lg rounded-xl transition-all shadow-lg red-glow disabled:opacity-50 mt-4"
                                     >
                                         {loading ? (

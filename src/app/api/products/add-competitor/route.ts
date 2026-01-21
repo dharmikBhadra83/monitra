@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { dbScrapeProduct } from '@/lib/db-scraper';
+import { convertToUSD, roundTo3Decimals } from '@/lib/currency';
 
 /**
  * POST /api/products/add-competitor
@@ -73,26 +74,121 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get or create the competitor product and update it with canonicalProductId and userId
-    let competitorProduct = await prisma.product.findUnique({
-      where: { url: competitorUrl }
+    // Check if competitor URL already exists for this user (but not in a mapping)
+    let competitorProduct = await prisma.product.findFirst({
+      where: { 
+        url: competitorUrl,
+        userId: userId
+      }
     }) as any;
 
-    if (!competitorProduct) {
-      return NextResponse.json(
-        { error: 'Failed to create/find competitor product' },
-        { status: 500 }
-      );
+    let isNewProduct = false;
+
+    if (competitorProduct) {
+      // If it exists and is already in a mapping, check if it's the same mapping
+      if (competitorProduct.canonicalProductId) {
+        if (competitorProduct.canonicalProductId !== mainProduct.canonicalProductId) {
+          return NextResponse.json(
+            { error: 'This competitor is already in a different mapping group' },
+            { status: 400 }
+          );
+        }
+        // Already in the same mapping, return it
+        return NextResponse.json({
+          success: true,
+          competitor: {
+            id: competitorProduct.id,
+            name: competitorProduct.name,
+            brand: competitorProduct.brand,
+            price: competitorProduct.latestPrice,
+            priceUSD: competitorProduct.priceUSD,
+            currency: competitorProduct.currency,
+            url: competitorProduct.url,
+            imageUrl: competitorProduct.imageUrl,
+          },
+          totalCompetitors: (await prisma.product.findMany({
+            where: {
+              canonicalProductId: mainProduct.canonicalProductId,
+              userId: userId,
+              id: { not: mainProductId }
+            } as any
+          })).length,
+          canonicalProductId: mainProduct.canonicalProductId
+        });
+      }
+      // Exists but not in a mapping, update it
+      competitorProduct = await prisma.product.update({
+        where: { id: competitorProduct.id },
+        data: {
+          canonicalProductId: mainProduct.canonicalProductId,
+        } as any
+      }) as any;
+    } else {
+      // Check quota before creating new product
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { urlQuota: true, urlUsed: true }
+      });
+
+      if (!user) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      if (user.urlUsed >= user.urlQuota) {
+        return NextResponse.json(
+          { 
+            error: 'URL quota exceeded',
+            quotaExceeded: true,
+            urlUsed: user.urlUsed,
+            urlQuota: user.urlQuota
+          },
+          { status: 403 }
+        );
+      }
+
+      // Scrape and create new competitor product
+      const competitorDna = await dbScrapeProduct(competitorUrl);
+      const { convertToUSD, roundTo3Decimals } = await import('@/lib/currency');
+      const roundedPrice = roundTo3Decimals(competitorDna.price);
+      const priceUSD = convertToUSD(roundedPrice, competitorDna.currency || 'INR');
+
+      competitorProduct = await prisma.product.create({
+        data: {
+          url: competitorUrl,
+          userId,
+          canonicalProductId: mainProduct.canonicalProductId,
+          name: competitorDna.name,
+          brand: competitorDna.brand || '',
+          latestPrice: roundedPrice,
+          priceUSD: priceUSD,
+          currency: competitorDna.currency || 'INR',
+          verifiedByAI: competitorDna.verifiedByAI || false,
+          imageUrl: competitorDna.imageUrl,
+        } as any
+      }) as any;
+
+      // Create price log
+      await prisma.priceLog.create({
+        data: {
+          price: roundedPrice,
+          priceUSD: priceUSD,
+          currency: competitorDna.currency || 'USD',
+          productId: competitorProduct.id,
+        } as any
+      });
+
+      isNewProduct = true;
+
+      // Update user's urlUsed count
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          urlUsed: {
+            increment: 1
+          }
+        }
+      });
     }
-
-    // Update competitor with userId and canonicalProductId to join the group
-    competitorProduct = await prisma.product.update({
-      where: { id: competitorProduct.id },
-      data: {
-        userId,
-        canonicalProductId: mainProduct.canonicalProductId,
-      } as any
-    }) as any;
 
     // Get all competitors in this group to return count
     const allCompetitors = await prisma.product.findMany({

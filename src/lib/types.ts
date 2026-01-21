@@ -8,6 +8,7 @@ export interface ProductDNA {
     description?: string;
     imageUrl?: string;
     url: string;
+    verifiedByAI?: boolean; // Whether AI verified the price and currency match
 }
 
 export interface CompetitorProduct {

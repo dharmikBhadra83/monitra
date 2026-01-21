@@ -71,7 +71,7 @@ export function PriceChart({ report }: PriceChartProps) {
                         {data.map((entry, index) => (
                             <Cell
                                 key={`cell-${index}`}
-                                fill={entry.isTarget ? '#f43f5e' : '#9CA3AF'}
+                                fill={entry.isTarget ? '#22c55e' : '#9CA3AF'}
                                 className="transition-all duration-300 hover:opacity-80"
                             />
                         ))}
