@@ -14,7 +14,6 @@ import {
   LayoutDashboard,
   Package,
   X,
-  Target,
 } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
@@ -55,8 +54,12 @@ export function AppSidebar({ activeTab, onTabChange, ...props }: AppSidebarProps
       >
         <SidebarHeader className="border-b border-[var(--color-black-border)]">
           <div className={`flex items-center gap-3 py-4 ${state === "expanded" ? "px-6 justify-start" : "px-2 justify-center"}`}>
-            <div className="w-9 h-9 rounded-xl bg-[var(--color-red-primary)] flex items-center justify-center red-glow shrink-0">
-              <Target className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 flex items-center justify-center shrink-0">
+              <img 
+                src="/logo.png" 
+                alt="Monitra Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             {state === "expanded" && (
               <span className="font-bold text-lg tracking-tight text-[var(--color-black-text)]">

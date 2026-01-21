@@ -73,7 +73,14 @@ export function LandingPage() {
             {/* Navigation */}
             <div className="fixed flex z-50 w-full pt-6 pr-4 pl-4 top-0 left-0 justify-center">
                 <nav className="shadow-black/50 flex md:gap-12 md:w-auto bg-black/60 w-full max-w-5xl rounded-none pt-2 pr-2 pb-2 pl-6 shadow-2xl backdrop-blur-lg gap-x-8 gap-y-8 items-center justify-between" style={{ position: 'relative', '--border-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2))', '--border-radius-before': '0' } as any}>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0">
+                        <div className="w-8 h-8 flex items-center justify-center">
+                            <img 
+                                src="/logo.png" 
+                                alt="Monitra Logo" 
+                                className="w-full h-full object-contain"
+                            />
+                        </div>
                         <span className="text-base font-medium tracking-tight text-white font-sans">
                             Monitra
                         </span>
@@ -118,6 +125,17 @@ export function LandingPage() {
                 </div>
 
                 <div className="z-10 text-center max-w-5xl mt-24 mr-auto mb-24 ml-auto pr-6 pl-6 relative">
+                    {/* Logo */}
+                    <div className="[animation:fadeSlideIn_1s_ease-out_0.5s_both] animate-on-scroll flex justify-center mb-8">
+                        <div className="w-20 h-20 flex items-center justify-center">
+                            <img 
+                                src="/logo.png" 
+                                alt="Monitra Logo" 
+                                className="w-full h-full object-contain"
+                            />
+                        </div>
+                    </div>
+                    
                     {/* Badge */}
                     <div className="[animation:fadeSlideIn_1s_ease-out_0.8s_both] animate-on-scroll inline-flex transition-transform hover:scale-105 cursor-pointer group animate bg-gradient-to-br from-white/10 to-white/0 rounded-full mb-10 pt-1.5 pr-3 pb-1.5 pl-3 backdrop-blur-sm gap-x-2 gap-y-2 items-center" style={{ position: 'relative', '--border-gradient': 'linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1))', '--border-radius-before': '9999px' } as any}>
                         <span className="flex h-1.5 w-1.5 rounded-full group-hover:animate-pulse bg-green-600 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
@@ -504,11 +522,12 @@ export function LandingPage() {
                             <div>
                                 {/* Logo */}
                                 <div className="flex items-center gap-3 mb-8">
-                                    <div className="grid grid-cols-2 gap-1 w-8 h-8 opacity-90">
-                                        <div className="bg-[#22c55e] w-full h-full rounded-sm"></div>
-                                        <div className="w-full h-full bg-zinc-700 rounded-sm [animation:fadeSlideIn_1s_ease-out_0.3s_both] animate-on-scroll"></div>
-                                        <div className="w-full h-full bg-zinc-800 rounded-sm"></div>
-                                        <div className="w-full h-full bg-white rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.4)]"></div>
+                                    <div className="w-10 h-10 flex-shrink-0 [animation:fadeSlideIn_1s_ease-out_0.3s_both] animate-on-scroll">
+                                        <img 
+                                            src="/logo.png" 
+                                            alt="Monitra Logo" 
+                                            className="w-full h-full object-contain"
+                                        />
                                     </div>
                                     <span className="text-2xl font-bold tracking-tight text-white font-sans">
                                         Monitra
