@@ -23,8 +23,26 @@ export async function GET() {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
+        // Recalculate urlUsed based on actual product count to ensure accuracy
+        const actualProductCount = await prisma.product.count({
+            where: {
+                userId: userId,
+                canonicalProductId: { not: null }
+            }
+        });
+
+        // Update urlUsed if it doesn't match actual count
+        let urlUsed = user.urlUsed;
+        if (actualProductCount !== user.urlUsed) {
+            await prisma.user.update({
+                where: { id: userId },
+                data: { urlUsed: actualProductCount }
+            });
+            urlUsed = actualProductCount;
+        }
+
         // Ensure urlUsed is never negative
-        const urlUsed = Math.max(0, user.urlUsed);
+        urlUsed = Math.max(0, urlUsed);
         const remaining = Math.max(0, user.urlQuota - urlUsed);
         
         return NextResponse.json({

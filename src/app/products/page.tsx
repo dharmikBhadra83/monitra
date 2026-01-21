@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { convertFromUSD, formatPrice } from '@/lib/currency';
 import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function ProductsPage() {
   const [productsData, setProductsData] = useState<any>(null);
@@ -273,9 +274,24 @@ export default function ProductsPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4 mb-4">
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-2xl font-bold text-[var(--color-black-text)] mb-2 line-clamp-2">
-                              {product.name}
-                            </h3>
+                            {product.name && product.name.length > 50 ? (
+                              <TooltipProvider>
+                                <Tooltip delayDuration={200}>
+                                  <TooltipTrigger asChild>
+                                    <h3 className="text-2xl font-bold text-[var(--color-black-text)] mb-2 line-clamp-2 block">
+                                      {product.name.substring(0, 50)}...
+                                    </h3>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="max-w-md z-50">
+                                    <p className="whitespace-normal text-sm">{product.name}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ) : (
+                              <h3 className="text-2xl font-bold text-[var(--color-black-text)] mb-2 line-clamp-2">
+                                {product.name}
+                              </h3>
+                            )}
                             <div className="flex items-center gap-3 flex-wrap mb-3">
                               <Badge className="bg-[var(--color-black-card-hover)] text-[var(--color-black-text)] border-[var(--color-black-border)]">
                                 {product.brand}
@@ -377,7 +393,24 @@ export default function ProductsPage() {
                                   />
                                 )}
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-semibold text-[var(--color-black-text)] truncate">{product.name}</p>
+                                  {product.name && product.name.length > 50 ? (
+                                    <TooltipProvider>
+                                      <Tooltip delayDuration={200}>
+                                        <TooltipTrigger asChild>
+                                          <p className="text-sm font-semibold text-[var(--color-black-text)] truncate block">
+                                            {product.name.substring(0, 50)}...
+                                          </p>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" className="max-w-md z-50">
+                                          <p className="whitespace-normal text-sm">{product.name}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  ) : (
+                                    <p className="text-sm font-semibold text-[var(--color-black-text)] truncate">
+                                      {product.name}
+                                    </p>
+                                  )}
                                   <p className="text-xs text-[var(--color-black-text-muted)] truncate">{product.url}</p>
                                 </div>
                                 <div className="text-right">

@@ -185,7 +185,7 @@ export default function LoginPage() {
           className="mt-8 text-center"
         >
           <p className="text-sm text-[var(--color-black-text-muted)]">
-            Powered by AI-Powered Intelligence
+            Powered by RudrX Techlabs
           </p>
         </motion.div>
       </motion.div>

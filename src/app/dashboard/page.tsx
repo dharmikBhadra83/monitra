@@ -216,6 +216,7 @@ export default function DashboardPage() {
                                     onDelete={() => {
                                         fetchProductsData();
                                         fetchQuotaData();
+                                        fetchDashboardData();
                                     }}
                                 />
                             )}
@@ -225,11 +226,12 @@ export default function DashboardPage() {
                                 {showAddProduct && (
                                     <AddProductForm
                                         onClose={() => setShowAddProduct(false)}
-                                        onSuccess={() => {
-                                            fetchProductsData();
-                                            fetchQuotaData();
-                                            setShowAddProduct(false);
-                                        }}
+                                    onSuccess={() => {
+                                        fetchProductsData();
+                                        fetchQuotaData();
+                                        fetchDashboardData();
+                                        setShowAddProduct(false);
+                                    }}
                                         onQuotaExceeded={() => {
                                             setShowSubscriptionModal(true);
                                         }}

@@ -304,7 +304,7 @@ export function LandingPage() {
 
                             <div className="flex items-baseline gap-2 mb-2">
                                 <span className="text-[1.5rem] align-top text-zinc-400 font-medium translate-y-2">$</span>
-                                <span className="text-6xl font-medium text-white tracking-tighter font-sans">49</span>
+                                <span className="text-6xl font-medium text-white tracking-tighter font-sans">0</span>
                                 <span className="text-zinc-500 text-lg font-normal font-sans">/ mo</span>
                             </div>
                             <p className="text-zinc-500 text-sm font-sans mb-10">
@@ -386,7 +386,7 @@ export function LandingPage() {
                                 onClick={handleGetStarted}
                                 className="flex cursor-pointer items-center justify-center gap-2 px-6 py-3 bg-white text-black text-sm font-bold font-sans hover:bg-zinc-200 transition-all w-full"
                             >
-                                Get Started
+                                Coming Soon
                             </button>
                         </div>
 
@@ -407,7 +407,7 @@ export function LandingPage() {
                                 <div className="flex items-start gap-3">
                                     <Check className="w-4 h-4 text-[#22c55e] shrink-0 mt-0.5" />
                                     <span className="text-sm text-zinc-300">
-                                        Hourly price updates
+                                        Daily price updates
                                     </span>
                                 </div>
                                 <div className="flex items-start gap-3">
@@ -425,7 +425,7 @@ export function LandingPage() {
                                 <div className="flex items-start gap-3">
                                     <Check className="w-4 h-4 text-[#22c55e] shrink-0 mt-0.5" />
                                     <span className="text-sm text-zinc-300">
-                                        API access
+                                        Email alerts
                                     </span>
                                 </div>
                             </div>
@@ -448,7 +448,12 @@ export function LandingPage() {
                                 </span>
                             </div>
 
-
+                            <button
+                                onClick={handleGetStarted}
+                                className="group flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 text-white text-sm font-medium font-sans hover:bg-zinc-800 transition-all w-full"
+                            >
+                                Coming Soon
+                            </button>
                         </div>
 
                         <div className="border-t border-zinc-800/80 my-10 w-full"></div>
@@ -511,7 +516,7 @@ export function LandingPage() {
                                 </div>
 
                                 <p className="text-zinc-400 max-w-sm text-sm leading-relaxed mb-12 font-medium">
-                                    We offer clarity and collaboration tools to help teams effectively plan, track, and launch digital products.
+                                    We offer AI-powered price intelligence tools to help businesses effectively track competitor prices, monitor market trends, and make data-driven pricing decisions.
                                 </p>
                             </div>
 
@@ -555,7 +560,7 @@ export function LandingPage() {
                                             </svg>
                                         </a>
                                         <a href="#pricing" className="group flex items-center justify-between text-xs font-medium text-zinc-400 hover:text-white transition-colors">
-                                            SERVICES
+                                            PRICING
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-green-600">
                                                 <path d="m9 18 6-6-6-6"></path>
                                             </svg>
@@ -566,12 +571,12 @@ export function LandingPage() {
                                                 <path d="m9 18 6-6-6-6"></path>
                                             </svg>
                                         </a> */}
-                                        <a href="#" className="group flex items-center justify-between text-xs font-medium text-zinc-400 hover:text-white transition-colors">
+                                        {/* <a href="#" className="group flex items-center justify-between text-xs font-medium text-zinc-400 hover:text-white transition-colors">
                                             FAQS
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-green-600">
                                                 <path d="m9 18 6-6-6-6"></path>
                                             </svg>
-                                        </a>
+                                        </a> */}
                                     </div>
                                 </div>
 
@@ -587,12 +592,7 @@ export function LandingPage() {
                                                 <path d="m9 18 6-6-6-6"></path>
                                             </svg>
                                         </a>
-                                        <a href="#" className="group flex items-center justify-between text-xs font-medium text-zinc-400 hover:text-white transition-colors">
-                                            ABOUT
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-green-600">
-                                                <path d="m9 18 6-6-6-6"></path>
-                                            </svg>
-                                        </a>
+                                        
                                         <a href="#pricing" className="group flex items-center justify-between text-xs font-medium text-zinc-400 hover:text-white transition-colors">
                                             PRICING
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-green-600">
@@ -644,14 +644,11 @@ export function LandingPage() {
                 </div>
 
                 {/* Bottom Bar */}
-                {/* <div className="w-full py-8 text-center border-t border-dashed border-zinc-800 bg-black z-20 relative [animation:fadeSlideIn_1s_ease-out_0.5s_both] animate-on-scroll">
+                <div className="w-full py-8 text-center border-t border-dashed border-zinc-800 bg-black z-20 relative [animation:fadeSlideIn_1s_ease-out_0.5s_both] animate-on-scroll">
                     <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-[0.2em] font-sans">
-                        Made with ❤️ by
-                        <a href="#" className="hover:text-white transition-colors text-[#22c55e] ml-1">
-                            Monitra Team
-                        </a>
+                        Powered by RudrX Techlabs
                     </p>
-                </div> */}
+                </div>
             </footer>
         </div>
     );

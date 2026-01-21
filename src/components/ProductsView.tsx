@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { convertFromUSD, formatPrice } from '@/lib/currency';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AddCompetitorForm } from '@/components/AddCompetitorForm';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // --- 1. THE PERFECT CENTER CONNECTOR ---
 function TreeConnector({ isOpen, competitorCount }: { isOpen: boolean; competitorCount: number }) {
@@ -345,12 +346,22 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
                       </div>
                     </TableCell>
                     <TableCell className="font-bold text-zinc-100 py-0">
-                      <span
-                        title={mainProduct?.name || ''}
-                        className="cursor-help line-clamp-2"
-                      >
-                        {mainProduct?.name}
-                      </span>
+                      {mainProduct?.name && mainProduct.name.length > 50 ? (
+                        <TooltipProvider>
+                          <Tooltip delayDuration={200}>
+                            <TooltipTrigger asChild>
+                              <span className="line-clamp-2 block">
+                                {mainProduct.name.substring(0, 50)}...
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-md z-50">
+                              <p className="whitespace-normal text-sm">{mainProduct.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : (
+                        <span className="line-clamp-2 block">{mainProduct?.name}</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-zinc-400 w-[120px] py-0">{cleanBrand(mainProduct?.brand) || '-'}</TableCell>
                     <TableCell className="w-[160px] py-0">
@@ -446,12 +457,22 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
 
                               {/* Name column - matches main row Name */}
                               <TableCell className="font-bold text-zinc-100 py-0">
-                                <span
-                                  title={comp.name || ''}
-                                  className="cursor-help line-clamp-2"
-                                >
-                                  {comp.name}
-                                </span>
+                                {comp.name && comp.name.length > 50 ? (
+                                  <TooltipProvider>
+                                    <Tooltip delayDuration={200}>
+                                      <TooltipTrigger asChild>
+                                        <span className="line-clamp-2 block">
+                                          {comp.name.substring(0, 50)}...
+                                        </span>
+                                      </TooltipTrigger>
+                                      <TooltipContent side="top" className="max-w-md z-50">
+                                        <p className="whitespace-normal text-sm">{comp.name}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                ) : (
+                                  <span className="line-clamp-2 block">{comp.name}</span>
+                                )}
                               </TableCell>
 
                               {/* Brand column - matches main row Brand */}

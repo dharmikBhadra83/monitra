@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
-import { dbScrapeProduct } from '@/lib/db-scraper';
+import { aiDirectExtractProduct } from '@/lib/ai-direct-extractor';
 import { convertToUSD, roundTo3Decimals } from '@/lib/currency';
 
 /**
@@ -63,9 +63,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Scrape the competitor product
+    // Validate the competitor URL by extracting product data using AI directly
     try {
-      await dbScrapeProduct(competitorUrl);
+      await aiDirectExtractProduct(competitorUrl);
     } catch (error) {
       console.error(`Failed to scrape competitor ${competitorUrl}:`, error);
       return NextResponse.json(
@@ -146,9 +146,8 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Scrape and create new competitor product
-      const competitorDna = await dbScrapeProduct(competitorUrl);
-      const { convertToUSD, roundTo3Decimals } = await import('@/lib/currency');
+      // Extract and create new competitor product using AI
+      const competitorDna = await aiDirectExtractProduct(competitorUrl);
       const roundedPrice = roundTo3Decimals(competitorDna.price);
       const priceUSD = convertToUSD(roundedPrice, competitorDna.currency || 'INR');
 
