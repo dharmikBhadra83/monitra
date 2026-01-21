@@ -85,9 +85,9 @@ export function LandingPage() {
                         <a href="#pricing" className="text-xs font-medium text-gray-400 hover:text-white transition-colors font-sans">
                             Pricing
                         </a>
-                        <a href="#testimonials" className="text-xs font-medium text-gray-400 hover:text-white transition-colors font-sans">
+                        {/* <a href="#testimonials" className="text-xs font-medium text-gray-400 hover:text-white transition-colors font-sans">
                             Reviews
-                        </a>
+                        </a> */}
                     </div>
                     <div className="flex gap-4 shrink-0 gap-x-4 gap-y-4 items-center">
                         <button
@@ -271,102 +271,7 @@ export function LandingPage() {
                 </div>
             </section>
 
-            {/* Testimonials Section */}
-            <section id="testimonials" className="overflow-hidden w-full max-w-7xl z-20 mt-0 mr-auto mb-32 ml-auto pt-20 pb-20 relative">
-                <div className="absolute top-20 left-10 w-96 h-96 rounded-full blur-[120px] pointer-events-none select-none -z-10 mix-blend-screen bg-green-600/10"></div>
-                <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none select-none -z-10 mix-blend-screen"></div>
-
-                <div className="z-10 pr-6 pl-6 relative">
-                    <div className="text-center mb-20 max-w-3xl mx-auto [animation:fadeSlideIn_1s_ease-out_0.2s_both] animate-on-scroll">
-                        <h3 className="leading-[1.1] md:text-6xl text-4xl font-normal text-white tracking-tight font-sans mb-6">
-                            Loved by
-                            <span className="text-zinc-500"> passionate</span>
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-zinc-500"> builders</span>
-                        </h3>
-                        <p className="text-lg text-zinc-400 font-sans leading-relaxed max-w-2xl mx-auto">
-                            Join thousands of businesses who rely on Monitra to stay competitive.
-                        </p>
-                    </div>
-
-                    {/* Testimonials Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-                        {/* Testimonial 1 */}
-                        <div className="group hover:border-white/10 transition-all duration-300 overflow-hidden border-dashed bg-black/50 border-zinc-800 border rounded-none pt-8 pr-8 pb-8 pl-8 relative backdrop-blur-sm [animation:fadeSlideIn_1s_ease-out_0.3s_both] animate-on-scroll">
-                            <div className="flex items-center gap-1 mb-6 text-zinc-300">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                                ))}
-                            </div>
-                            <p className="text-zinc-300 font-sans leading-relaxed text-base mb-8">
-                                "Monitra completely transformed our pricing strategy. We've increased margins by 15% while staying competitive."
-                            </p>
-                            <div className="flex items-center gap-4 border-t border-white/5 pt-6">
-                                <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 overflow-hidden ring-2 ring-white/5">
-                                    <div className="w-full h-full bg-gradient-to-br from-green-600 to-green-800"></div>
-                                </div>
-                                <div>
-                                    <div className="text-sm font-semibold text-white font-sans">
-                                        Sarah Chen
-                                    </div>
-                                    <div className="text-xs text-zinc-500 font-medium">
-                                        CEO at TechStore
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Testimonial 2 */}
-                        <div className="group hover:border-white/10 transition-all duration-300 overflow-hidden bg-zinc-900/40 border-white/5 border rounded-none pt-8 pr-8 pb-8 pl-8 relative backdrop-blur-sm [animation:fadeSlideIn_1s_ease-out_0.4s_both] animate-on-scroll">
-                            <div className="flex items-center gap-1 mb-6 text-zinc-300">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                                ))}
-                            </div>
-                            <p className="text-zinc-300 font-sans leading-relaxed text-base mb-8">
-                                "The AI insights are incredible. We now make pricing decisions based on data, not guesswork."
-                            </p>
-                            <div className="flex items-center gap-4 border-t border-white/5 pt-6">
-                                <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 overflow-hidden ring-2 ring-white/5">
-                                    <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800"></div>
-                                </div>
-                                <div>
-                                    <div className="text-sm font-semibold text-white font-sans">
-                                        Michael Rodriguez
-                                    </div>
-                                    <div className="text-xs text-zinc-500 font-medium">
-                                        Pricing Manager at RetailCo
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Testimonial 3 */}
-                        <div className="group hover:border-white/10 transition-all duration-300 overflow-hidden bg-zinc-900/40 border-white/5 border rounded-none pt-8 pr-8 pb-8 pl-8 relative backdrop-blur-sm [animation:fadeSlideIn_1s_ease-out_0.5s_both] animate-on-scroll md:col-span-2 lg:col-span-1">
-                            <div className="flex items-center gap-1 mb-6 text-zinc-300">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                                ))}
-                            </div>
-                            <p className="text-zinc-300 font-sans leading-relaxed text-base mb-8">
-                                "Real-time alerts saved us from losing market share. Best investment we made this year."
-                            </p>
-                            <div className="flex items-center gap-4 border-t border-white/5 pt-6">
-                                <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 overflow-hidden ring-2 ring-white/5">
-                                    <div className="w-full h-full bg-gradient-to-br from-green-600 to-green-800"></div>
-                                </div>
-                                <div>
-                                    <div className="text-sm font-semibold text-white font-sans">
-                                        Emma Thompson
-                                    </div>
-                                    <div className="text-xs text-zinc-500 font-medium">
-                                        Director at MarketPlace
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {/* Testimonials Section - Commented out for now */}
 
             {/* Pricing Section */}
             <section id="pricing" className="w-full max-w-7xl z-20 mt-0 mr-auto mb-32 ml-auto pt-6 pr-6 pb-6 pl-6 relative">
@@ -403,7 +308,7 @@ export function LandingPage() {
                                 <span className="text-zinc-500 text-lg font-normal font-sans">/ mo</span>
                             </div>
                             <p className="text-zinc-500 text-sm font-sans mb-10">
-                                Up to 50 products tracked
+                                50 URLs
                             </p>
 
                             <button
@@ -424,7 +329,7 @@ export function LandingPage() {
                                 <div className="flex items-start gap-3">
                                     <Check className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
                                     <span className="text-sm text-zinc-300 font-sans leading-snug">
-                                        Up to 50 products
+                                        50 URLs
                                     </span>
                                 </div>
                                 <div className="flex items-start gap-3">
@@ -436,7 +341,7 @@ export function LandingPage() {
                                 <div className="flex items-start gap-3">
                                     <Check className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
                                     <span className="text-sm text-zinc-300 font-sans leading-snug">
-                                        Email alerts
+                                        Free trial
                                     </span>
                                 </div>
                                 <div className="flex items-start gap-3">
@@ -469,12 +374,12 @@ export function LandingPage() {
 
                             <div className="flex items-baseline gap-2 mb-2">
                                 <span className="text-[1.5rem] text-zinc-400 font-medium translate-y-2">$</span>
-                                <span className="text-6xl font-medium text-white tracking-tighter font-sans">149</span>
+                                <span className="text-6xl font-medium text-white tracking-tighter font-sans">14</span>
                                 <span className="text-zinc-500 text-lg font-sans">/ mo</span>
                             </div>
 
                             <p className="text-zinc-500 text-sm font-sans mb-10">
-                                Up to 500 products tracked
+                                500 URLs
                             </p>
 
                             <button
@@ -496,7 +401,7 @@ export function LandingPage() {
                                 <div className="flex items-start gap-3">
                                     <Check className="w-4 h-4 text-[#22c55e] shrink-0 mt-0.5" />
                                     <span className="text-sm text-zinc-300">
-                                        Up to 500 products
+                                        500 URLs
                                     </span>
                                 </div>
                                 <div className="flex items-start gap-3">
@@ -655,12 +560,12 @@ export function LandingPage() {
                                                 <path d="m9 18 6-6-6-6"></path>
                                             </svg>
                                         </a>
-                                        <a href="#testimonials" className="group flex items-center justify-between text-xs font-medium text-zinc-400 hover:text-white transition-colors">
+                                        {/* <a href="#testimonials" className="group flex items-center justify-between text-xs font-medium text-zinc-400 hover:text-white transition-colors">
                                             REVIEWS
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-green-600">
                                                 <path d="m9 18 6-6-6-6"></path>
                                             </svg>
-                                        </a>
+                                        </a> */}
                                         <a href="#" className="group flex items-center justify-between text-xs font-medium text-zinc-400 hover:text-white transition-colors">
                                             FAQS
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-green-600">
@@ -739,14 +644,14 @@ export function LandingPage() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="w-full py-8 text-center border-t border-dashed border-zinc-800 bg-black z-20 relative [animation:fadeSlideIn_1s_ease-out_0.5s_both] animate-on-scroll">
+                {/* <div className="w-full py-8 text-center border-t border-dashed border-zinc-800 bg-black z-20 relative [animation:fadeSlideIn_1s_ease-out_0.5s_both] animate-on-scroll">
                     <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-[0.2em] font-sans">
                         Made with ❤️ by
                         <a href="#" className="hover:text-white transition-colors text-[#22c55e] ml-1">
                             Monitra Team
                         </a>
                     </p>
-                </div>
+                </div> */}
             </footer>
         </div>
     );
