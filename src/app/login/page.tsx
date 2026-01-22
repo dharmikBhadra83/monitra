@@ -7,7 +7,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Brain, Chrome, Loader2, AlertCircle } from 'lucide-react';
+import { Chrome, Loader2, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const { data: session, status } = useSession();
@@ -64,8 +64,12 @@ export default function LoginPage() {
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="relative"
             >
-              <div className="w-20 h-20 rounded-2xl bg-[var(--color-red-opacity)] border-2 border-[var(--color-red-border)] flex items-center justify-center">
-                <Brain className="w-10 h-10 text-[var(--color-red-primary)]" />
+              <div className="w-20 h-20 flex items-center justify-center">
+                <img 
+                  src="/logo.png" 
+                  alt="Monitra Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               {/* Glow effect */}
               <motion.div

@@ -381,9 +381,9 @@ export function LandingPage() {
                                 <h3 className="text-4xl font-medium text-white tracking-tighter font-sans">
                                     Professional
                                 </h3>
-                                <span className="text-[10px] uppercase font-semibold text-white tracking-wider bg-[#22c55e] rounded-sm px-2 py-1 shadow-[0_0_10px_rgba(34,197,94,0.35)]">
+                                {/* <span className="text-[10px] uppercase font-semibold text-white tracking-wider bg-[#22c55e] rounded-sm px-2 py-1 shadow-[0_0_10px_rgba(34,197,94,0.35)]">
                                     Most Popular
-                                </span>
+                                </span> */}
                             </div>
 
                             <p className="text-zinc-400 text-base font-sans leading-relaxed mb-8">
@@ -401,7 +401,7 @@ export function LandingPage() {
                             </p>
 
                             <button
-                                onClick={handleGetStarted}
+                                // onClick={handleGetStarted}
                                 className="flex cursor-pointer items-center justify-center gap-2 px-6 py-3 bg-white text-black text-sm font-bold font-sans hover:bg-zinc-200 transition-all w-full"
                             >
                                 Coming Soon
@@ -467,8 +467,8 @@ export function LandingPage() {
                             </div>
 
                             <button
-                                onClick={handleGetStarted}
-                                className="group flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 text-white text-sm font-medium font-sans hover:bg-zinc-800 transition-all w-full"
+                                // onClick={handleGetStarted}
+                                className="group cursor-pointer flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 text-white text-sm font-medium font-sans hover:bg-zinc-800 transition-all w-full"
                             >
                                 Coming Soon
                             </button>
@@ -541,19 +541,19 @@ export function LandingPage() {
 
                             {/* Social Icons */}
                             <div className="flex items-center gap-3 mt-auto">
-                                <a href="#" className="w-10 h-10 flex items-center justify-center border border-dashed border-zinc-700 hover:border-green-600 hover:bg-green-600/10 hover:text-green-600 transition-all duration-300 rounded text-zinc-400 group">
+                                <a className="w-10 h-10 flex items-center justify-center border border-dashed border-zinc-700 hover:border-green-600 hover:bg-green-600/10 hover:text-green-600 transition-all duration-300 rounded text-zinc-400 group">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram">
                                         <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
                                         <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                                         <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
                                     </svg>
                                 </a>
-                                <a href="#" className="w-10 h-10 flex items-center justify-center border border-dashed border-zinc-700 hover:border-green-600 hover:bg-green-600/10 hover:text-green-600 transition-all duration-300 rounded text-zinc-400 group">
+                                <a  className="w-10 h-10 flex items-center justify-center border border-dashed border-zinc-700 hover:border-green-600 hover:bg-green-600/10 hover:text-green-600 transition-all duration-300 rounded text-zinc-400 group">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-twitter">
                                         <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
                                     </svg>
                                 </a>
-                                <a href="#" className="w-10 h-10 flex items-center justify-center border border-dashed border-zinc-700 hover:border-green-600 hover:bg-green-600/10 hover:text-green-600 transition-all duration-300 rounded text-zinc-400 group">
+                                <a  className="w-10 h-10 flex items-center justify-center border border-dashed border-zinc-700 hover:border-green-600 hover:bg-green-600/10 hover:text-green-600 transition-all duration-300 rounded text-zinc-400 group">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-globe">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
