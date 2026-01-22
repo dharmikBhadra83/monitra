@@ -274,7 +274,7 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
             Display Currency
           </label>
           <select
-            value={selectedCurrency || 'USD'}
+            value={selectedCurrency || 'INR'}
             onChange={(e) => setSelectedCurrency && setSelectedCurrency(e.target.value)}
             className="px-4 py-2.5 rounded-lg bg-[#111] border-2 border-[#1a1a1a] text-white text-sm font-medium cursor-pointer focus:outline-none focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/20 hover:border-[#2a2a2a] hover:bg-[#151515] transition-all shadow-sm min-w-[140px] appearance-none pr-10"
             style={{
@@ -284,10 +284,10 @@ export function ProductsView({ data, expandedProducts, setExpandedProducts, onDe
               backgroundSize: '1rem 1rem'
             }}
           >
+            <option value="INR" className="bg-[#111] text-white">INR (₹)</option>
             <option value="USD" className="bg-[#111] text-white">USD ($)</option>
             <option value="EUR" className="bg-[#111] text-white">EUR (€)</option>
             <option value="GBP" className="bg-[#111] text-white">GBP (£)</option>
-            <option value="INR" className="bg-[#111] text-white">INR (₹)</option>
             <option value="JPY" className="bg-[#111] text-white">JPY (¥)</option>
             <option value="CAD" className="bg-[#111] text-white">CAD (C$)</option>
             <option value="AUD" className="bg-[#111] text-white">AUD (A$)</option>

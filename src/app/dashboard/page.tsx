@@ -20,7 +20,7 @@ export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'products'>('dashboard');
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [dashboardLoading, setDashboardLoading] = useState(false);
-    const [selectedCurrency, setSelectedCurrency] = useState<string>('USD');
+    const [selectedCurrency, setSelectedCurrency] = useState<string>('INR');
     const [productsData, setProductsData] = useState<any>(null);
     const [productsLoading, setProductsLoading] = useState(false);
     const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
@@ -181,10 +181,10 @@ export default function DashboardPage() {
                                         onChange={(e) => setSelectedCurrency(e.target.value)}
                                         className="px-4 py-2 rounded-lg bg-[var(--color-black-card)] border border-[var(--color-black-border)] text-[var(--color-black-text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] hover:bg-[var(--color-black-card-hover)] transition-colors"
                                     >
+                                        <option value="INR">INR (₹)</option>
                                         <option value="USD">USD ($)</option>
                                         <option value="EUR">EUR (€)</option>
                                         <option value="GBP">GBP (£)</option>
-                                        <option value="INR">INR (₹)</option>
                                         <option value="JPY">JPY (¥)</option>
                                         <option value="CAD">CAD (C$)</option>
                                         <option value="AUD">AUD (A$)</option>
