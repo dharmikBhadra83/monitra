@@ -3,7 +3,7 @@ module.exports = {
     name: 'monitra',
     script: 'node_modules/next/dist/bin/next',
     args: 'start',
-    cwd: '/home/ubuntu/monitra',
+    cwd: '/home/ubuntu/projects/monitra',
     instances: 1,
     exec_mode: 'fork',
     env: {

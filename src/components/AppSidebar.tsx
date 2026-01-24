@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   Package,
   X,
+  Monitor,
 } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
@@ -29,11 +30,16 @@ const navItems = [
     icon: LayoutDashboard,
     id: "dashboard",
   },
+  {
+    title: "Monitor",
+    icon: Monitor,
+    id: "monitor",
+  },
 ] as const
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  activeTab: "dashboard" | "products"
-  onTabChange: (tab: "dashboard" | "products") => void
+  activeTab: "dashboard" | "products" | "monitor"
+  onTabChange: (tab: "dashboard" | "products" | "monitor") => void
 }
 
 export function AppSidebar({ activeTab, onTabChange, ...props }: AppSidebarProps) {
@@ -89,7 +95,7 @@ export function AppSidebar({ activeTab, onTabChange, ...props }: AppSidebarProps
                       name="nav-menu"
                       checked={activeTab === item.id}
                       onChange={() => {
-                        onTabChange(item.id as "dashboard" | "products")
+                        onTabChange(item.id as "dashboard" | "products" | "monitor")
                       }}
                     />
                     <label htmlFor={`nav-${item.id}`} className={`text-sm flex items-center ${state === "expanded" ? "gap-2 justify-start" : "justify-center"} overflow-hidden`}>

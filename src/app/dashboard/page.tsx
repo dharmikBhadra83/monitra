@@ -12,12 +12,13 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { HeaderWithSidebar } from '@/components/Header';
 import { QuotaDisplay } from '@/components/QuotaDisplay';
 import { SubscriptionModal } from '@/components/SubscriptionModal';
-import { DollarSign, LayoutDashboard, Package } from 'lucide-react';
+import { DollarSign, LayoutDashboard, Package, Monitor } from 'lucide-react';
+import { MonitorView } from '@/components/MonitorView';
 
 export default function DashboardPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'products'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'monitor'>('dashboard');
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [dashboardLoading, setDashboardLoading] = useState(false);
     const [selectedCurrency, setSelectedCurrency] = useState<string>('INR');
@@ -150,6 +151,7 @@ export default function DashboardPage() {
                         if (tab === 'products' && !productsData) {
                             fetchProductsData();
                         }
+                        // Monitor tab data is fetched by the MonitorView component
                     }}
                 />
 
@@ -219,6 +221,11 @@ export default function DashboardPage() {
                                         fetchDashboardData();
                                     }}
                                 />
+                            )}
+
+                            {/* Monitor Tab Content */}
+                            {activeTab === 'monitor' && (
+                                <MonitorView selectedCurrency={selectedCurrency} />
                             )}
 
                             {/* Add Product Modal Overlay */}

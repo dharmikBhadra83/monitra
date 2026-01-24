@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
-import { aiDirectExtractProduct } from '@/lib/ai-direct-extractor';
+import { extractProduct } from '@/lib/extractor-factory';
 import { convertToUSD, roundTo3Decimals } from '@/lib/currency';
 
 export async function POST(req: NextRequest) {
@@ -72,8 +72,8 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // 2. Extract main product using AI directly (no selectors, no scraping logic)
-        const mainProductDna = await aiDirectExtractProduct(mainUrl);
+        // 2. Extract main product using HyperAgent
+        const mainProductDna = await extractProduct(mainUrl);
         // Round price to 3 decimal places and convert to USD
         const roundedPrice = roundTo3Decimals(mainProductDna.price);
         const priceUSD = convertToUSD(roundedPrice, mainProductDna.currency || 'INR');
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
                         }
 
                         // Scrape competitor - get data only (no DB operations)
-                        const competitorDna = await aiDirectExtractProduct(url);
+                        const competitorDna = await extractProduct(url);
                         // Round price to 3 decimal places and convert to USD
                         const roundedCompetitorPrice = roundTo3Decimals(competitorDna.price);
                         const competitorPriceUSD = convertToUSD(roundedCompetitorPrice, competitorDna.currency || 'INR');

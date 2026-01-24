@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
-import { aiDirectExtractProduct } from '@/lib/ai-direct-extractor';
+import { extractProduct } from '@/lib/extractor-factory';
 import { convertToUSD, roundTo3Decimals } from '@/lib/currency';
 
 /**
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
             validUrls.map(async (url: string) => {
                 try {
                     // Scrape product - get data only (no DB operations)
-                    const productDna = await aiDirectExtractProduct(url);
+                    const productDna = await extractProduct(url);
                     
                     // Round price to 3 decimal places and convert to USD
                     const roundedPrice = roundTo3Decimals(productDna.price);
