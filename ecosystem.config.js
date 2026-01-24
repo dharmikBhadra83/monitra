@@ -6,13 +6,13 @@ module.exports = {
     cwd: '/home/ubuntu/monitra',
     instances: 1,
     exec_mode: 'fork',
-    env_file: '.env.local',  // Add this line
+    env_file: '.env.local',
     env: {
       NODE_ENV: 'production',
       PORT: 3000
     },
-    error_file: '/var/log/pm2/monitra-error.log',
-    out_file: '/var/log/pm2/monitra-out.log',
+    error_file: './logs/err.log',  // Changed to relative path
+    out_file: './logs/out.log',     // Changed to relative path
     log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
     merge_logs: true,
     autorestart: true,
