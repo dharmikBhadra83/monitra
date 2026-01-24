@@ -54,7 +54,7 @@ export async function GET() {
 
         // Logic to group products
         const productGroups = new Map<number, any[]>();
-        products.forEach((p) => {
+        products.forEach((p: any) => {
             if (p.canonicalProductId) {
                 if (!productGroups.has(p.canonicalProductId)) {
                     productGroups.set(p.canonicalProductId, []);
