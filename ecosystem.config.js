@@ -3,9 +3,10 @@ module.exports = {
     name: 'monitra',
     script: 'node_modules/next/dist/bin/next',
     args: 'start',
-    cwd: '/home/ubuntu/projects/monitra',
+    cwd: '/home/ubuntu/monitra',
     instances: 1,
     exec_mode: 'fork',
+    env_file: '.env.local',  // Add this line
     env: {
       NODE_ENV: 'production',
       PORT: 3000
@@ -16,7 +17,5 @@ module.exports = {
     merge_logs: true,
     autorestart: true,
     max_memory_restart: '1G',
-    watch: false,
-    ignore_watch: ['node_modules', '.next', '.git']
   }]
 };
