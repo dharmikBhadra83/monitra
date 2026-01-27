@@ -1,5 +1,4 @@
 // @ts-ignore - next-auth types will be available after npm install
-import { NextAuthOptions } from 'next-auth';
 // @ts-ignore
 import GoogleProvider from 'next-auth/providers/google';
 // @ts-ignore
@@ -10,8 +9,6 @@ import { prisma } from './prisma';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
-const NEXTAUTH_URL = process.env.NEXTAUTH_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
 
 // Check if required env vars are missing
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
@@ -34,8 +31,8 @@ export const {
   adapter: PrismaAdapter(prisma) as any,
   providers: [
     GoogleProvider({
-      clientId: GOOGLE_CLIENT_ID || 'dummy-client-id',
-      clientSecret: GOOGLE_CLIENT_SECRET || 'dummy-client-secret',
+      clientId: GOOGLE_CLIENT_ID ,
+      clientSecret: GOOGLE_CLIENT_SECRET,
       authorization: {
         params: {
           access_type: "offline",
@@ -63,8 +60,7 @@ export const {
   session: {
     strategy: 'database',
   },
-  secret: NEXTAUTH_SECRET || 'fallback-secret-change-in-production',
-  debug: process.env.NODE_ENV === 'development',
+  secret: NEXTAUTH_SECRET,
 });
 
 // For backward compatibility if needed elsewhere
@@ -72,8 +68,8 @@ export const authOptions = {
   adapter: PrismaAdapter(prisma) as any,
   providers: [
     GoogleProvider({
-      clientId: GOOGLE_CLIENT_ID || 'dummy-client-id',
-      clientSecret: GOOGLE_CLIENT_SECRET || 'dummy-client-secret',
+      clientId: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
     }),
   ],
   session: { strategy: 'database' },
