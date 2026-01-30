@@ -130,13 +130,18 @@ export function MonitorView({ selectedCurrency }: { selectedCurrency: string }) 
                   <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em] text-right">Old Price</TableHead>
                   <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em] text-right">New Price</TableHead>
                   <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em] text-right">Difference %</TableHead>
+                  <TableHead className="text-zinc-500 text-[11px] font-bold uppercase tracking-[0.2em] text-right">Changed</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedPriceChanges.map((change, idx) => {
+                {sortedPriceChanges.map((change) => {
                   const oldPriceDisplay = convertFromUSD(change.oldPrice, selectedCurrency);
                   const newPriceDisplay = convertFromUSD(change.newPrice, selectedCurrency);
                   const isIncrease = change.differencePercent > 0;
+                  const changedAt = new Date(change.timestamp).toLocaleString(undefined, {
+                    dateStyle: 'short',
+                    timeStyle: 'short',
+                  });
 
                   return (
                     <TableRow
@@ -146,10 +151,10 @@ export function MonitorView({ selectedCurrency }: { selectedCurrency: string }) 
                       <TableCell className="font-bold text-[var(--color-black-text)] py-4">
                         {change.productName}
                       </TableCell>
-                      <TableCell className="text-right text-[var(--color-black-text-muted)] py-4">
+                      <TableCell className="text-right text-[var(--color-black-text-muted)] py-4 tabular-nums">
                         {formatPrice(oldPriceDisplay, selectedCurrency)}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-[var(--color-black-text)] py-4">
+                      <TableCell className="text-right font-bold text-[var(--color-black-text)] py-4 tabular-nums">
                         {formatPrice(newPriceDisplay, selectedCurrency)}
                       </TableCell>
                       <TableCell className="text-right py-4">
@@ -159,12 +164,15 @@ export function MonitorView({ selectedCurrency }: { selectedCurrency: string }) 
                             : 'text-green-500'
                         }`}>
                           {isIncrease ? (
-                            <TrendingUp className="w-4 h-4" />
+                            <TrendingUp className="w-4 h-4 shrink-0" />
                           ) : (
-                            <TrendingDown className="w-4 h-4" />
+                            <TrendingDown className="w-4 h-4 shrink-0" />
                           )}
                           <span>{Math.abs(change.differencePercent).toFixed(2)}%</span>
                         </div>
+                      </TableCell>
+                      <TableCell className="text-right text-[var(--color-black-text-muted)] text-sm py-4 whitespace-nowrap">
+                        {changedAt}
                       </TableCell>
                     </TableRow>
                   );

@@ -78,19 +78,7 @@ export async function DELETE(
           where: { id: { in: productIds } }
         });
 
-        // Decrement user's urlUsed count (ensure it doesn't go below 0)
-        const currentUser = await tx.user.findUnique({
-          where: { id: userId },
-          select: { urlUsed: true }
-        });
-        const newUrlUsed = Math.max(0, (currentUser?.urlUsed || 0) - productIds.length);
-        await tx.user.update({
-          where: { id: userId },
-          data: {
-            urlUsed: newUrlUsed
-          }
-        });
-
+        // Do not decrement urlUsed — deleting does not free quota slots
         return {
           deletedProducts: productIds.length,
           totalProductsInGroup: productIds.length,
@@ -108,19 +96,7 @@ export async function DELETE(
           where: { id: product.id }
         });
 
-        // Decrement user's urlUsed count (ensure it doesn't go below 0)
-        const currentUser = await tx.user.findUnique({
-          where: { id: userId },
-          select: { urlUsed: true }
-        });
-        const newUrlUsed = Math.max(0, (currentUser?.urlUsed || 0) - 1);
-        await tx.user.update({
-          where: { id: userId },
-          data: {
-            urlUsed: newUrlUsed
-          }
-        });
-
+        // Do not decrement urlUsed — deleting does not free quota slots
         return {
           deletedProducts: 1,
           totalProductsInGroup: 1

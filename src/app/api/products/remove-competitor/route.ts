@@ -84,18 +84,7 @@ export async function DELETE(req: NextRequest) {
             where: { id: product.id } as any
         });
 
-        // Decrement user's urlUsed count (ensure it doesn't go below 0)
-        const currentUser = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { urlUsed: true }
-        });
-        const newUrlUsed = Math.max(0, (currentUser?.urlUsed || 0) - 1);
-        await prisma.user.update({
-            where: { id: userId },
-            data: {
-                urlUsed: newUrlUsed
-            }
-        });
+        // Do not decrement urlUsed — deleting does not free quota slots
 
         // Get remaining products count in the group
         let remainingCount = 0;

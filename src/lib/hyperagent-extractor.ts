@@ -55,13 +55,20 @@ function getHyperAgent(): HyperAgent {
 export async function extractProductWithHyperAgent(
   url: string,
 ): Promise<ProductDNA> {
-  const domain = new URL(url).hostname.replace("www.", "");
+  const urlObj = new URL(url);
+  const domain = urlObj.hostname.replace("www.", "");
 
   // Clean URL: Remove query parameters and tracking params for consistent page loads
-  // Amazon URLs with ref/query params can load different content or redirect
   const cleanUrl = new URL(url);
-  cleanUrl.search = ""; // Remove all query parameters
+  cleanUrl.search = "";
   const finalUrl = cleanUrl.toString();
+
+  // Flipkart: extract product slug from URL path to anchor extraction (e.g. /lazygreg-graphic.../p/ → "lazygreg graphic")
+  let flipkartProductSlug = "";
+  if (/flipkart\.(com|co\.in)/i.test(domain)) {
+    const match = urlObj.pathname.match(/^\/([^/]+)\/p\//);
+    flipkartProductSlug = match ? match[1].replace(/-/g, " ").trim() : "";
+  }
 
   console.log(
     `[HyperAgent] 🌐 Starting extraction for: ${finalUrl} (${domain})`,
@@ -94,94 +101,113 @@ export async function extractProductWithHyperAgent(
     let aiFriendlyContent = domState.domState;
     const originalSize = aiFriendlyContent.length;
 
-    // Post-process: Remove unnecessary sections to reduce token usage
-    // Filter out common non-product content patterns (less aggressive filtering)
+    // Flipkart needs full content — truncation leads to wrong prices; other sites use trimmed content
+    const isFlipkart = /flipkart\.(com|co\.in)/i.test(domain);
+    const useFullTokens = isFlipkart;
+
+    // Post-process: Remove unnecessary sections to reduce token usage (skip for Flipkart)
     const lines = aiFriendlyContent.split("\n");
-    const filteredLines: string[] = [];
-    let skipCount = 0;
-    const skipPatterns = [
-      /navigation/i,
-      /footer/i,
-      /banner/i,
-      /cookie/i,
-      /privacy/i,
-      /terms/i,
-      /you may also like/i,
-      /frequently bought together/i,
-      /customers who viewed/i,
-      /sponsored/i,
-      /advertisement/i,
-    ];
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      
-      // Check if line matches skip patterns
-      const matchesSkipPattern = skipPatterns.some((pattern) => pattern.test(line));
-      
-      // Skip header only if it's at the very beginning (first 20 lines)
-      const isEarlyHeader = i < 20 && /^header$/i.test(line.trim());
-      
-      if (matchesSkipPattern || isEarlyHeader) {
-        // Only skip a few lines after pattern (not entire sections)
-        skipCount = 3; // Skip next 3 lines after pattern
-        continue;
-      }
-      
-      // Skip if we're in skip countdown
-      if (skipCount > 0) {
-        skipCount--;
-        // But always include lines with price information, even during skip
-        if (
-          line.includes("price") ||
-          line.includes("₹") ||
-          line.includes("INR") ||
-          line.includes("Rs") ||
-          line.includes("rupee") ||
-          line.includes("add to cart") ||
-          line.includes("buy now") ||
-          /\d+\.?\d*\s*(INR|₹|Rs|rupee)/i.test(line)
-        ) {
-          filteredLines.push(line);
-          skipCount = 0; // Reset skip when we find price info
+    if (!useFullTokens) {
+      // Filter and truncate for non-Flipkart sites
+      const filteredLines: string[] = [];
+      let skipCount = 0;
+      const skipPatterns = [
+        /navigation/i,
+        /footer/i,
+        /banner/i,
+        /cookie/i,
+        /privacy/i,
+        /terms/i,
+        /you may also like/i,
+        /frequently bought together/i,
+        /customers who viewed/i,
+        /sponsored/i,
+        /advertisement/i,
+      ];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const matchesSkipPattern = skipPatterns.some((pattern) => pattern.test(line));
+        const isEarlyHeader = i < 20 && /^header$/i.test(line.trim());
+
+        if (matchesSkipPattern || isEarlyHeader) {
+          skipCount = 3;
+          continue;
         }
-        continue;
+        if (skipCount > 0) {
+          skipCount--;
+          if (
+            line.includes("price") ||
+            line.includes("₹") ||
+            line.includes("INR") ||
+            line.includes("Rs") ||
+            line.includes("rupee") ||
+            line.includes("add to cart") ||
+            line.includes("buy now") ||
+            /\d+\.?\d*\s*(INR|₹|Rs|rupee)/i.test(line)
+          ) {
+            filteredLines.push(line);
+            skipCount = 0;
+          }
+          continue;
+        }
+        filteredLines.push(line);
       }
 
-      // Always include the line
-      filteredLines.push(line);
-    }
+      aiFriendlyContent = filteredLines.join("\n");
 
-    aiFriendlyContent = filteredLines.join("\n");
-    
-    // Ensure minimum content size to preserve important information
-    const MIN_CONTENT_SIZE = 5 * 1024; // 5KB minimum
-    if (aiFriendlyContent.length < MIN_CONTENT_SIZE && originalSize > MIN_CONTENT_SIZE) {
-      // If filtering removed too much, use less aggressive filtering
-      console.log(`[HyperAgent] ⚠️  Filtering removed too much content, using less aggressive filter`);
-      // Take first portion of original content with minimal filtering
-      const minimalFilter = lines.filter((line, idx) => {
-        // Only skip obvious non-content lines
-        return !/^(navigation|footer|cookie|privacy|terms)$/i.test(line.trim()) || 
-               idx < 50 || // Keep first 50 lines
-               line.includes("price") || 
-               line.includes("₹") || 
-               /\d+/.test(line); // Keep lines with numbers
-      });
-      aiFriendlyContent = minimalFilter.join("\n");
-    }
+      const MIN_CONTENT_SIZE = 5 * 1024;
+      if (aiFriendlyContent.length < MIN_CONTENT_SIZE && originalSize > MIN_CONTENT_SIZE) {
+        console.log(`[HyperAgent] ⚠️  Filtering removed too much content, using less aggressive filter`);
+        const minimalFilter = lines.filter((line, idx) => {
+          return !/^(navigation|footer|cookie|privacy|terms)$/i.test(line.trim()) ||
+            idx < 50 ||
+            line.includes("price") ||
+            line.includes("₹") ||
+            /\d+/.test(line);
+        });
+        aiFriendlyContent = minimalFilter.join("\n");
+      }
 
-    // Truncate to first 25KB (focus on main product area, reduces token usage by ~60%)
-    // Most product info is in the first part of the page
-    const MAX_CONTENT_SIZE = 25 * 1024; // 25KB = ~6,250 tokens
-    if (aiFriendlyContent.length > MAX_CONTENT_SIZE) {
-      aiFriendlyContent = aiFriendlyContent.substring(0, MAX_CONTENT_SIZE);
-      console.log(
-        `[HyperAgent] 📊 Accessibility tree: ${(originalSize / 1024).toFixed(2)}KB → ${(aiFriendlyContent.length / 1024).toFixed(2)}KB (filtered & truncated)`,
-      );
+      const MAX_CONTENT_SIZE = 25 * 1024;
+      if (aiFriendlyContent.length > MAX_CONTENT_SIZE) {
+        aiFriendlyContent = aiFriendlyContent.substring(0, MAX_CONTENT_SIZE);
+        console.log(
+          `[HyperAgent] 📊 Accessibility tree: ${(originalSize / 1024).toFixed(2)}KB → ${(aiFriendlyContent.length / 1024).toFixed(2)}KB (filtered & truncated)`,
+        );
+      } else {
+        console.log(
+          `[HyperAgent] 📊 Accessibility tree: ${(originalSize / 1024).toFixed(2)}KB → ${(aiFriendlyContent.length / 1024).toFixed(2)}KB (filtered)`,
+        );
+      }
     } else {
+      // Flipkart: keep ONLY main product section — cut at recommendation sections
+      // Those sections show different products with wrong prices; main product is typically first
+      const RECOMMENDATION_MARKERS = [
+        /\bsimilar\s+products\b/i,
+        /\byou may also like\b/i,
+        /\brecently\s+viewed\b/i,
+        /\bfrequently bought together\b/i,
+        /\bcompare with similar\b/i,
+        /\brecommended for you\b/i,
+      ];
+      const MIN_MAIN_CONTENT = 8 * 1024; // Keep at least 8KB to avoid cutting main product
+      let cutIndex = lines.length;
+      for (let i = 0; i < lines.length; i++) {
+        const trimmed = lines[i].trim();
+        if (trimmed.length < 5) continue;
+        if (RECOMMENDATION_MARKERS.some((p) => p.test(trimmed))) {
+          const wouldKeep = lines.slice(0, i).join("\n").length;
+          if (wouldKeep >= MIN_MAIN_CONTENT) {
+            cutIndex = i;
+            break;
+          }
+        }
+      }
+      aiFriendlyContent = lines.slice(0, cutIndex).join("\n");
       console.log(
-        `[HyperAgent] 📊 Accessibility tree: ${(originalSize / 1024).toFixed(2)}KB → ${(aiFriendlyContent.length / 1024).toFixed(2)}KB (filtered)`,
+        `[HyperAgent] 📊 Flipkart: main product only (${(originalSize / 1024).toFixed(2)}KB → ${(aiFriendlyContent.length / 1024).toFixed(2)}KB)`,
       );
     }
 
@@ -215,7 +241,13 @@ export async function extractProductWithHyperAgent(
         .describe("Main product image URL (null if not available)"),
     });
 
-    // Build instruction
+    // Build instruction (Flipkart gets extra anchoring from URL slug)
+    const flipkartHint = flipkartProductSlug
+      ? `
+
+FLIPKART: The URL identifies the product as "${flipkartProductSlug}". The content below contains ONLY the main product (recommendation sections removed). Extract the single price shown near "Add to Cart" / "Buy Now".`
+      : "";
+
     const instruction = `Extract product information from this page for the MAIN PRODUCT ONLY.
 
 CRITICAL EXTRACTION RULES:
@@ -227,7 +259,7 @@ CRITICAL EXTRACTION RULES:
 6. Default currency to INR if uncertain
 
 Current page URL: ${finalUrl}
-This URL represents the MAIN PRODUCT you should extract information for.`;
+This URL represents the MAIN PRODUCT you should extract information for.${flipkartHint}`;
 
     // Build prompt with accessibility tree content
     const prompt = `${instruction}
@@ -268,7 +300,7 @@ Page content (accessibility tree):\n${aiFriendlyContent}\n\nExtract the informat
     const productDNA: ProductDNA = {
       name: extracted.name || "",
       brand: extracted.brand || "",
-      price: extracted.price || 0,
+      price: extracted.price ?? 0,
       currency: extracted.currency || "INR",
       category: extracted.category || "",
       features: extracted.features || [],

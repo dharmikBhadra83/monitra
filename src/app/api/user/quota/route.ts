@@ -23,7 +23,7 @@ export async function GET() {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // Recalculate urlUsed based on actual product count to ensure accuracy
+        // Recalculate actual product count for consistency checks
         const actualProductCount = await prisma.product.count({
             where: {
                 userId: userId,
@@ -31,9 +31,10 @@ export async function GET() {
             }
         });
 
-        // Update urlUsed if it doesn't match actual count
+        // Only sync urlUsed UP when actual count exceeds stored value (fixes drift).
+        // Never sync DOWN — deleting does not free quota slots.
         let urlUsed = user.urlUsed;
-        if (actualProductCount !== user.urlUsed) {
+        if (actualProductCount > user.urlUsed) {
             await prisma.user.update({
                 where: { id: userId },
                 data: { urlUsed: actualProductCount }
